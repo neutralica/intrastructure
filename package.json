@@ -1,0 +1,25 @@
+{
+  "name": "intrastructure",
+  "version": "0.1.0",
+  "description": "_INTRASTRUCTURE: error handling, monadic returns, HTTP requests, and [....]",
+  "author": "neutralica @ terminal_gothic",
+  "license": "Parity-7.0.0",
+  "type": "module",
+  "files": ["dist", "README.md", "LICENSE"],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

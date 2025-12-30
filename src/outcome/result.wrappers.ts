@@ -1,6 +1,6 @@
 // result.wrappers.ts
 
-import { enrichResult } from "../error-report/error-report.infra.js";
+import { enrichResult } from "../error-report/error-report.js";
 import { $r } from "./result.infra.js";
 import { NO_VAL, type Result, type ResultAsync, type ROnlySuccess } from "./result.types.js";
 

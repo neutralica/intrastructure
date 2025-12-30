@@ -26,12 +26,13 @@
         "types": [],
         "lib": ["ESNext", "DOM", "DOM.Iterable"]
     },
+
     "include": ["src/**/*.ts"],
     "exclude": [
         "dist",
         "node_modules",
         "**/*.test.ts",
-        "src/node.ts",
-        "src/**/*.node.types.ts"
+        "src/node/**",
+        "src/types/node.types.ts"
     ]
 }

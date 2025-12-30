@@ -1,6 +1,6 @@
 // result.types.ts
 
-import type ErrReport from "../error-report/error-report.infra.js";
+import type ErrReport from "../error-report/error-report.js";
 
 /**
  *  Result

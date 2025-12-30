@@ -1,11 +1,11 @@
 {
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "types": ["node"],
-    "composite": true
-  },
-  "files": [
-    "src/node.ts",
-    "src/types/meta.node.types.ts"
-  ]
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": ["node"]
+    },
+    "files": [
+        "src/node/index.ts",
+        "src/node/types.ts",
+        "src/types/node.types.ts"
+    ]
 }

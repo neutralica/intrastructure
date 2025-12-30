@@ -7,14 +7,52 @@
   "type": "module",
   "files": ["dist", "README.md", "LICENSE"],
   "types": "./dist/index.d.ts",
- "exports": {
+"exports": {
   ".": {
     "types": "./dist/index.d.ts",
     "import": "./dist/index.js"
   },
+
+  "./core": {
+    "types": "./dist/core/index.d.ts",
+    "import": "./dist/core/index.js"
+  },
+
   "./node": {
-    "types": "./dist/node.d.ts",
-    "import": "./dist/node.js"
+    "types": "./dist/node/index.d.ts",
+    "import": "./dist/node/index.js"
+  },
+  "./node/types": {
+    "types": "./dist/node/types.d.ts",
+    "import": "./dist/node/types.js"
+  },
+
+  "./outcome": {
+    "types": "./dist/outcome/index.d.ts",
+    "import": "./dist/outcome/index.js"
+  },
+  "./outcome/types": {
+    "types": "./dist/outcome/types.d.ts",
+    "import": "./dist/outcome/types.js"
+  },
+
+  "./error-report": {
+    "types": "./dist/error-report/index.d.ts",
+    "import": "./dist/error-report/index.js"
+  },
+
+  "./network-request": {
+    "types": "./dist/network-request/index.d.ts",
+    "import": "./dist/network-request/index.js"
+  },
+  "./network-request/types": {
+    "types": "./dist/network-request/types.d.ts",
+    "import": "./dist/network-request/types.js"
+  },
+
+  "./types": {
+    "types": "./dist/types/index.d.ts",
+    "import": "./dist/types/index.js"
   }
 },
   "scripts": {

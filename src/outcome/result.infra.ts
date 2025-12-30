@@ -2,7 +2,8 @@
 // result-util.ts
 
 import { ErrSeverity, ErrSource } from "../error-report/err-consts/err-consts.js";
-import ErrReport, { type ErrData } from "../error-report/error-report.infra.js";
+import ErrReport from "../error-report/error-report.js";
+import { type ErrData } from "../error-report/err-report.types.js";
 import { NO_VAL, type NoValue, type RDataSuccess, type Result, type RFailErr, type ROnlySuccess } from "./result.types.js";
 import { r_$ } from "./result.wrappers.js";
 

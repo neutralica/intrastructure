@@ -1,32 +1,38 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "composite": true,
+        "rootDir": "./src",
+        "outDir": "./dist",
 
-    "rootDir": "./src",
-    "outDir": "./dist",
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
 
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+        "strict": true,
+        "exactOptionalPropertyTypes": true,
+        "noUncheckedIndexedAccess": true,
 
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true,
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "noUncheckedSideEffectImports": true,
+        "moduleDetection": "force",
 
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
 
-    "forceConsistentCasingInFileNames": true,
-
-    "skipLibCheck": true,
-
-    "types": [],
-    "lib": ["ES2022"]
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["dist", "node_modules", "**/*.test.ts"]
+        "types": [],
+        "lib": ["ESNext", "DOM", "DOM.Iterable"]
+    },
+    "references": [{ "path": "./tsconfig.node.json" }],
+    "include": ["src/**/*.ts"],
+    "exclude": [
+        "dist",
+        "node_modules",
+        "**/*.test.ts",
+        "src/node.ts",
+        "src/**/*.node.types.ts"
+    ]
 }

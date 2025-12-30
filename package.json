@@ -7,19 +7,24 @@
   "type": "module",
   "files": ["dist", "README.md", "LICENSE"],
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+ "exports": {
+  ".": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js"
   },
+  "./node": {
+    "types": "./dist/node.d.ts",
+    "import": "./dist/node.js"
+  }
+},
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsc",
+    "build": "npm run clean && tsc -p tsconfig.json && tsc -p tsconfig.node.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@types": "node"
   }
 }

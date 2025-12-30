@@ -26,7 +26,6 @@
         "types": [],
         "lib": ["ESNext", "DOM", "DOM.Iterable"]
     },
-    "references": [{ "path": "./tsconfig.node.json" }],
     "include": ["src/**/*.ts"],
     "exclude": [
         "dist",

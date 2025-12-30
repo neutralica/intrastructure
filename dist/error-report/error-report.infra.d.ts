@@ -1,5 +1,5 @@
 import type { Result } from "../outcome/result.types.js";
-import type { ClientMeta, ServerMeta } from "../types/state-meta.types.js";
+import type { ClientMeta, ServerMeta } from "../types/core.types.js";
 import { ErrSource, type ErrSeverity } from "./err-consts/err-consts.js";
 export type ErrData = Partial<{
     [K in keyof ErrReport]: ErrReport[K];

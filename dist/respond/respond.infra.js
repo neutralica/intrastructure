@@ -1,11 +1,11 @@
 // respond.infra.ts
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "../outcome/outcome.infra.js";
+import { outcomeIs } from "../outcome/outcome.js";
 import { NO_VAL } from "../outcome/outcome.types.js";
 export const respond = {
     json: (fn) => async (req, res, next) => {
         const outcome = await checkOutcome(fn, req, res, next);
-        if (outcomeIs.dataOutcome(outcome)) {
+        if (outcomeIs.withData(outcome)) {
             res.json(outcome.data);
             return;
         }
@@ -17,7 +17,7 @@ export const respond = {
             res.sendStatus(204);
             return;
         }
-        if (outcomeIs.dataOutcome(outcome)) {
+        if (outcomeIs.withData(outcome)) {
             next(new Error('unexpected data payload in SEND'));
             return;
         }
@@ -27,7 +27,7 @@ export const respond = {
     // conditional below and simplifies 
     render: (fn) => async (req, res, next) => {
         const outcome = await checkOutcome(fn, req, res, next);
-        if (outcomeIs.dataOutcome(outcome)) {
+        if (outcomeIs.withData(outcome)) {
             if (typeof outcome.data === 'object' &&
                 outcome.data != NO_VAL &&
                 'view' in outcome.data &&

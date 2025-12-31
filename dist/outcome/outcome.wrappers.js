@@ -1,19 +1,23 @@
 // outcome.wrappers.ts
 import { enrichOutcome } from "../error-report/error-report.js";
-import { outcomeIs } from "./outcome.infra.js";
+import { outcomeIs } from "./outcome.js";
 import { NO_VAL } from "./outcome.types.js";
-export function r_$(outcome, msg) {
-    // this (below return type) WAS Promise<T>; now it's T. Either seems to work fine. Seems bad!
+export function wrap_data(outcome, msg) {
     const handler = (resolved) => {
+        // CHANGE: message / naming
         if (!validateOutcome(resolved))
-            throw outcomeIs.ERR(`r_$ received non-Outcome value`);
+            throw outcomeIs.ERR(`wrap_data received non-Outcome value`);
         const enriched = enrichOutcome(resolved);
         if (outcomeIs.failErr(enriched))
             throw enriched;
-        if (outcomeIs.successOnly(enriched))
-            throw outcomeIs.ERR('successful Outcome with no data');
+        if (outcomeIs.successOnly(enriched)) {
+            throw outcomeIs.ERR(msg ?? "successful Outcome with no data");
+        }
         return enriched.data;
     };
+    if (outcome instanceof Promise) {
+        return outcome.then(resolved => handler(resolved));
+    }
     return handler(outcome);
 }
 export function wrap_void(outcome, msg) {
@@ -22,7 +26,7 @@ export function wrap_void(outcome, msg) {
             throw outcomeIs.ERR(`r_$ received non-Outcome value`);
         }
         const enriched = enrichOutcome(unknownOutcome);
-        if (outcomeIs.dataOutcome(enriched)) {
+        if (outcomeIs.withData(enriched)) {
             throw outcomeIs.ERR('$Outcome<vøid> error: data not expected in Outcome<void>');
         }
         if (outcomeIs.failErr(enriched)) {
@@ -41,10 +45,10 @@ export function wrap_void(outcome, msg) {
         return handler(outcome);
     }
 }
-function validateOutcome(x) {
-    return (typeof x === 'object' &&
+export function validateOutcome(x) {
+    return (typeof x === "object" &&
         x !== null &&
-        'success' in x &&
-        x.success === true || x.success === false);
+        "success" in x &&
+        ((x.success === true) || (x.success === false)));
 }
 //# sourceMappingURL=outcome.wrappers.js.map

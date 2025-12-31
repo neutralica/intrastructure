@@ -1,6 +1,6 @@
 // error-report.ts
-import { outcomeIs } from "../outcome/outcome.infra.js";
-import { r_$ } from "../outcome/outcome.wrappers.js";
+import { outcomeIs } from "../outcome/outcome.js";
+import { wrap_data } from "../outcome/outcome.wrappers.js";
 import { ErrSource, ErrSeverity } from "./err-consts/err-consts.js";
 export default class ErrReport extends Error {
     message;

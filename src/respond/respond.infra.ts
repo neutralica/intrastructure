@@ -1,7 +1,7 @@
 // respond.infra.ts
 
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "../outcome/outcome.infra.js";
+import { outcomeIs } from "../outcome/outcome.js";
 import { NO_VAL, type OutcomeAsyncJSON, type OutcomeAsyncRender, type OutcomeAsyncSend, type OutcomeAsync } from "../outcome/outcome.types.js";
 import type {  HttpServerResponseLike, NextLike, ReqResNextHandler, TypedRequest } from "../types/http.types.js";
 
@@ -10,7 +10,7 @@ export const respond = {
     json: <T>(fn: (req: TypedRequest) => OutcomeAsyncJSON<T>): ReqResNextHandler =>
         async (req, res, next): Promise<void> => {
             const outcome = await checkOutcome(fn, req, res, next);
-            if (outcomeIs.dataOutcome(outcome)) {
+            if (outcomeIs.withData(outcome)) {
                 res.json(outcome.data);
 
                 return;
@@ -26,7 +26,7 @@ export const respond = {
 
                 return;
             }
-            if (outcomeIs.dataOutcome(outcome)) {
+            if (outcomeIs.withData(outcome)) {
                 next(new Error('unexpected data payload in SEND'));
 
                 return;
@@ -40,7 +40,7 @@ export const respond = {
         fn: (req: TypedRequest) => OutcomeAsyncRender<T>): ReqResNextHandler =>
         async (req, res, next): Promise<void> => {
             const outcome = await checkOutcome(fn, req, res, next);
-            if (outcomeIs.dataOutcome(outcome)) {
+            if (outcomeIs.withData(outcome)) {
                 if (typeof outcome.data === 'object' &&
                     outcome.data != NO_VAL &&
                     'view' in outcome.data &&

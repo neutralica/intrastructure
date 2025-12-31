@@ -1,8 +1,8 @@
 // error-report.ts
 
-import { outcomeIs } from "../outcome/outcome.infra.js";
+import { outcomeIs } from "../outcome/outcome.js";
 import type { Outcome } from "../outcome/outcome.types.js";
-import { r_$ } from "../outcome/outcome.wrappers.js";
+import { wrap_data } from "../outcome/outcome.wrappers.js";
 import type { ClientMeta, ServerMeta } from "../types/core.types.js";
 import { ErrSource, ErrSeverity } from "./err-consts/err-consts.js";
 import type { ErrData, RequiredData } from "./err-report.types.js";

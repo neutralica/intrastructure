@@ -1,4 +1,6 @@
 // outcome index.ts
 
-export * from './outcome.infra.js';
-export * from './outcome.wrappers.js';
+export {outcomeIs} from './outcome.js'
+export * from './outcome.js';
+export * from './outcome.wrappers.js'; 
+export * from './moat.wrappers.js';

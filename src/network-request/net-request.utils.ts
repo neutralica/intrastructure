@@ -1,9 +1,9 @@
 // send-http.ts
 
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "../outcome/outcome.infra.js";
+import { outcomeIs } from "../outcome/outcome.js";
 import type { Outcome, OutcomeAsync } from "../outcome/outcome.types.js";
-import { r_$ } from "../outcome/outcome.wrappers.js";
+import { wrap_data } from "../outcome/outcome.wrappers.js";
 import type { NetRequestFull, NetResponse, NetworkRequestSpec } from "./net-request.types.js";
 
 
@@ -71,7 +71,7 @@ export async function Send_NetRequest(req: NetRequestFull): OutcomeAsync<NetResp
         );
 
         const res = await retry(fetchOnce, policy.retries, policy.retryDelayMs);
-        const r_status = r_$(checkResponseStatus(res))
+        const r_status = wrap_data(checkResponseStatus(res))
         if (r_status !== 'ok') {
             return outcomeIs.ERR(`response not OK: ${r_status}`);
         }
@@ -142,11 +142,11 @@ async function Parse_ExtractHTML(response: Response, element: string): OutcomeAs
 
 export async function Validate_HTMLRes({ spec, res }: NetResponse): OutcomeAsync<HTMLElement> {
 
-    void r_$(checkResponseStatus(res), 'check response status');
+    void wrap_data(checkResponseStatus(res), 'check response status');
     if (!spec.extractElement) {
         return outcomeIs.ERR(`no element property given to extract`);
     }
-    const r_html = r_$(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
+    const r_html = wrap_data(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
     return outcomeIs.OK(r_html);
 
 }

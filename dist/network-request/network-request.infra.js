@@ -1,6 +1,6 @@
 // network-request.infra.ts
-import { outcomeIs } from "../outcome/outcome.infra.js";
-import { r_$ } from "../outcome/outcome.wrappers.js";
+import { outcomeIs } from "../outcome/outcome.js";
+import { wrap_data } from "../outcome/outcome.wrappers.js";
 import { RetryPresetΔ } from "./net-request.consts.js";
 import Build_NetRequest, { Send_NetRequest } from "./net-request.utils.js";
 export const $n = {
@@ -132,7 +132,7 @@ function n_wrap(spec) {
                 // 'throw' required here rather than return (which errors) - investigate (todo)
                 throw outcomeIs.ERR('no url or method on NetReq');
             }
-            const r_netreq = r_$(Build_NetRequest(spec));
+            const r_netreq = wrap_data(Build_NetRequest(spec));
             return Send_NetRequest(r_netreq);
         },
         // withMeta(meta: Record<string, unknown>) {}

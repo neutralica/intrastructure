@@ -1,6 +1,6 @@
 // format-err.ts
 
-export function ƒ_formatErr(err: unknown): string{
+export function format_err(err: unknown): string{
 
     if (err instanceof Error) {
         return err.message;

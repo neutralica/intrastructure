@@ -10,7 +10,7 @@ Early development. APIs are unstable and may change without notice.
 
 ## Planned modules
 
-- `Outcome`: success/failure return values (Result-like)
+- `Outcome`: success/failure return values (Outcome-like)
 - `ErrReport`: structured error objects and enrichment
 - `Net`: declarative request specs and execution helpers
 

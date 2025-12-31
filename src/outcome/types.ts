@@ -1,3 +1,3 @@
 // outcome types.ts
 
-export type * from './result.types.js'
+export type * from './outcome.types.js'

@@ -1,7 +1,7 @@
 // network-request.infra.ts
 
-import { $r } from "../outcome/result.infra.js";
-import { r_$ } from "../outcome/result.wrappers.js";
+import { outcomeIs } from "../outcome/outcome.infra.js";
+import { r_$ } from "../outcome/outcome.wrappers.js";
 import { RetryPresetΔ } from "./net-request.consts.js";
 import type { BodySpec, FailSpec, HeaderSpec, HTMLDiscriminant, HTMLSpec, JSONDiscriminant, JSONSpec, N_partial, N_request, NetworkRequestSpec, QuerySpec, RequestBuilder, URLSpec, FailRecoveryMode } from "./net-request.types.js";
 import Build_NetRequest, { Send_NetRequest } from "./net-request.utils.js";
@@ -152,7 +152,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         SEND() {
             if (!isNetRequestSpec(spec)) {
                 // 'throw' required here rather than return (which errors) - investigate (todo)
-                throw $r.XX('no url or method on NetReq');
+                throw outcomeIs.ERR('no url or method on NetReq');
             }
             const r_netreq = r_$(Build_NetRequest(spec));
             return Send_NetRequest(r_netreq);

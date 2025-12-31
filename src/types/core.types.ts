@@ -8,7 +8,7 @@ export interface ClientStateObj {
   graphState: string;
 }
 
-export type MetaValue = string | boolean | number | null | undefined;
+export type MetaValue = string | boolean | number | null | undefined | string[];
 
 export interface ClientMeta {
   source?: string;
@@ -18,7 +18,7 @@ export interface ClientMeta {
   pid?: number;
   uptime?: number;
   href?: string;
-  breadcrumbs?: string;
+  breadcrumbs?: string[];
   enriched?: boolean;
 
   [key: string]: MetaValue;
@@ -44,6 +44,6 @@ export interface ServerMeta {
   userAgent: string;
   requestID: string;
   platform?: string;
-  breadcrumbs?: string;
+  breadcrumbs?: string[];
   enriched?: boolean;
 }

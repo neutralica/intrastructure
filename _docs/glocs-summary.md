@@ -83,10 +83,10 @@
 	•	Provide doc-to-type consistency checks later:
 	•	e.g., if a doc directive claims bar: TypeA but TS says TypeA | undefined, flag it.
 	•	This makes docs “type-checked commentary” instead of drifting prose.
-	•	Integration with Result/ErrReport
+	•	Integration with outcome /ErrReport
 	•	Remove stack-regex “origin” helpers from core (imprecise).
 	•	Prefer explicit, sparse step IDs at boundaries:
-	•	enrichResult(result, stepId) where stepId comes from glocs tooling or module constants.
+	•	enrichOutcome(outcome, stepId) where stepId comes from glocs tooling or module constants
 	•	Glocs runtime instrumentation can add breadcrumbs precisely without stack guessing.
 	•	Scope boundaries / where to place IDs
 	•	Don’t tag every helper.

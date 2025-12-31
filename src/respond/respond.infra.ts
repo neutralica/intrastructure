@@ -1,51 +1,51 @@
 // respond.infra.ts
 
-import { ƒ_formatErr } from "../helpers/format-err.js";
-import { $r } from "../outcome/result.infra.js";
-import { NO_VAL, type R_asyncJSON, type R_asyncRNDR, type R_asyncSEND, type ResultAsync } from "../outcome/result.types.js";
+import { format_err } from "../helpers/format-err.js";
+import { outcomeIs } from "../outcome/outcome.infra.js";
+import { NO_VAL, type OutcomeAsyncJSON, type OutcomeAsyncRender, type OutcomeAsyncSend, type OutcomeAsync } from "../outcome/outcome.types.js";
 import type {  HttpServerResponseLike, NextLike, ReqResNextHandler, TypedRequest } from "../types/http.types.js";
 
 
 export const respond = {
-    JSON: <T>(fn: (req: TypedRequest) => R_asyncJSON<T>): ReqResNextHandler =>
+    json: <T>(fn: (req: TypedRequest) => OutcomeAsyncJSON<T>): ReqResNextHandler =>
         async (req, res, next): Promise<void> => {
-            const result = await processResult(fn, req, res, next);
-            if ($r.has_data(result)) {
-                res.json(result.data);
+            const outcome = await checkOutcome(fn, req, res, next);
+            if (outcomeIs.dataOutcome(outcome)) {
+                res.json(outcome.data);
 
                 return;
             }
-            next(result.err);
+            next(outcome.err);
         },
 
-    SEND: (fn: (req: TypedRequest) => R_asyncSEND): ReqResNextHandler =>
+    send: (fn: (req: TypedRequest) => OutcomeAsyncSend): ReqResNextHandler =>
         async (req, res, next): Promise<void> => {
-            const result = await processResult(fn, req, res, next);
-            if ($r.is_ok(result)) {
+            const outcome = await checkOutcome(fn, req, res, next);
+            if (outcomeIs.successOnly(outcome)) {
                 res.sendStatus(204);
 
                 return;
             }
-            if ($r.has_data(result)) {
+            if (outcomeIs.dataOutcome(outcome)) {
                 next(new Error('unexpected data payload in SEND'));
 
                 return;
             }
-            next(result.err);
+            next(outcome.err);
         },
 
     // createa a RenderPayload type that consolidates all the checks in the if typeof etc
     // conditional below and simplifies 
-    RNDR: <T extends Record<string, unknown>>(
-        fn: (req: TypedRequest) => R_asyncRNDR<T>): ReqResNextHandler =>
+    render: <T extends Record<string, unknown>>(
+        fn: (req: TypedRequest) => OutcomeAsyncRender<T>): ReqResNextHandler =>
         async (req, res, next): Promise<void> => {
-            const result = await processResult(fn, req, res, next);
-            if ($r.has_data(result)) {
-                if (typeof result.data === 'object' &&
-                    result.data != NO_VAL &&
-                    'view' in result.data &&
-                    typeof result.data.view === 'string') {
-                    const { view, ...locals } = result.data;
+            const outcome = await checkOutcome(fn, req, res, next);
+            if (outcomeIs.dataOutcome(outcome)) {
+                if (typeof outcome.data === 'object' &&
+                    outcome.data != NO_VAL &&
+                    'view' in outcome.data &&
+                    typeof outcome.data.view === 'string') {
+                    const { view, ...locals } = outcome.data;
                     res.render(view, locals);
 
                     return;
@@ -54,20 +54,20 @@ export const respond = {
 
                 return;
             }
-            if ($r.is_ok(result)) {
+            if (outcomeIs.successOnly(outcome)) {
                 next(new Error('cannot find required data'));
 
                 return;
             }
-            if ($r.is_xx(result)) {
-                next(result.err);
+            if (outcomeIs.failErr(outcome)) {
+                next(outcome.err);
             }
         },
 
-    AUTH: (fn: (req: TypedRequest) => R_asyncSEND): ReqResNextHandler => 
+    auth: (fn: (req: TypedRequest) => OutcomeAsyncSend): ReqResNextHandler => 
         async (req, res, next) => {
-            const result = await processResult(fn, req, res, next);
-            if ($r.is_ok(result)) {
+            const outcome = await checkOutcome(fn, req, res, next);
+            if (outcomeIs.successOnly(outcome)) {
                 console.log('debug — OK!');
                 res.redirect('/');
             } else {
@@ -78,18 +78,18 @@ export const respond = {
     
 };
 
-const processResult = async (
-    fn: (req: TypedRequest) => ResultAsync<unknown>,
+const checkOutcome = async (
+    fn: (req: TypedRequest) => OutcomeAsync<unknown>,
     req: TypedRequest,
     res: HttpServerResponseLike,
     next: NextLike
 ) => {
     try {
-        const result = await fn(req) ?? $r.XX('processed function returned undefined');
+        const outcome = await fn(req) ?? outcomeIs.ERR('processed function returned undefined');
 
 
-        return result;
+        return outcome;
     } catch (error) {
-        return $r.XX(ƒ_formatErr(error));
+        return outcomeIs.ERR(format_err(error));
     }
 };

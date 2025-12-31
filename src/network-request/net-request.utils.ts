@@ -1,13 +1,13 @@
 // send-http.ts
 
-import { ƒ_formatErr } from "../helpers/format-err.js";
-import { $r } from "../outcome/result.infra.js";
-import type { Result, ResultAsync } from "../outcome/result.types.js";
-import { r_$ } from "../outcome/result.wrappers.js";
+import { format_err } from "../helpers/format-err.js";
+import { outcomeIs } from "../outcome/outcome.infra.js";
+import type { Outcome, OutcomeAsync } from "../outcome/outcome.types.js";
+import { r_$ } from "../outcome/outcome.wrappers.js";
 import type { NetRequestFull, NetResponse, NetworkRequestSpec } from "./net-request.types.js";
 
 
-export default function Build_NetRequest(spec: NetworkRequestSpec): Result<NetRequestFull> {
+export default function Build_NetRequest(spec: NetworkRequestSpec): Outcome<NetRequestFull> {
     const {
         method,
         url,
@@ -50,7 +50,7 @@ export default function Build_NetRequest(spec: NetworkRequestSpec): Result<NetRe
 
     };
 
-    return $r.OK({
+    return outcomeIs.OK({
         url: fullURL,
         init,
         spec: spec
@@ -58,11 +58,11 @@ export default function Build_NetRequest(spec: NetworkRequestSpec): Result<NetRe
 
 }
 
-export async function Send_NetRequest(req: NetRequestFull): ResultAsync<NetResponse> {
+export async function Send_NetRequest(req: NetRequestFull): OutcomeAsync<NetResponse> {
     try {
         const policy = req.spec.failBehavior;
         if (!policy) {
-            return $r.XX('could not get policy');
+            return outcomeIs.ERR('could not get policy');
         }
 
         const fetchOnce = () => withTimeout(
@@ -73,13 +73,13 @@ export async function Send_NetRequest(req: NetRequestFull): ResultAsync<NetRespo
         const res = await retry(fetchOnce, policy.retries, policy.retryDelayMs);
         const r_status = r_$(checkResponseStatus(res))
         if (r_status !== 'ok') {
-            return $r.XX(`response not OK: ${r_status}`);
+            return outcomeIs.ERR(`response not OK: ${r_status}`);
         }
         const spec = req.spec;
-        return $r.OK({ spec, res });
+        return outcomeIs.OK({ spec, res });
     } catch (error) {
-        console.error(ƒ_formatErr(error));
-        return $r.XX(ƒ_formatErr(error));
+        console.error(format_err(error));
+        return outcomeIs.ERR(format_err(error));
     }
 
 
@@ -104,19 +104,19 @@ function withTimeout<T>(task: Promise<T>, ms: number): Promise<T>{
 /**
  * check response status code
  */
-export function checkResponseStatus(response: Response): Result<string> {
+export function checkResponseStatus(response: Response): Outcome<string> {
     if (response.status === 204) {
-        return $r.XX('no content'); // Special handling for 204 No Content
+        return outcomeIs.ERR('no content'); // Special handling for 204 No Content
     } else if (response.status >= 300 && response.status < 400) {
-        return $r.XX('redirect');
+        return outcomeIs.ERR('redirect');
     } else if (response.status >= 400 && response.status < 500) {
-        return $r.XX('client error');  // Handle 4xx client errors
+        return outcomeIs.ERR('client error');  // Handle 4xx client errors
     } else if (response.status >= 500) {
-        return $r.XX('server error');  // Handle 5xx server errors
+        return outcomeIs.ERR('server error');  // Handle 5xx server errors
     } else if (!response.ok) {
-        return $r.XX('unknown error: !response.ok');  // Handle any non-OK responses
+        return outcomeIs.ERR('unknown error: !response.ok');  // Handle any non-OK responses
     }
-    return $r.OK('ok');  // If everything is OK
+    return outcomeIs.OK('ok');  // If everything is OK
 }
 
 
@@ -128,26 +128,26 @@ export function checkResponseStatus(response: Response): Result<string> {
  * - queries html for element within html (usually '.response-container')
  * - returns element
  */
-async function Parse_ExtractHTML(response: Response, element: string): ResultAsync<HTMLElement> {
+async function Parse_ExtractHTML(response: Response, element: string): OutcomeAsync<HTMLElement> {
     const string = await response.text();
     const parser = new DOMParser;
     const html = parser.parseFromString(string, 'text/html');
 
     const container = html.querySelector(element);
     if (!(container instanceof HTMLElement)) {
-        return $r.XX('container not found');
+        return outcomeIs.ERR('container not found');
     }
-    return $r.OK(container);
+    return outcomeIs.OK(container);
 }
 
-export async function Validate_HTMLRes({ spec, res }: NetResponse): ResultAsync<HTMLElement> {
+export async function Validate_HTMLRes({ spec, res }: NetResponse): OutcomeAsync<HTMLElement> {
 
     void r_$(checkResponseStatus(res), 'check response status');
     if (!spec.extractElement) {
-        return $r.XX(`no element property given to extract`);
+        return outcomeIs.ERR(`no element property given to extract`);
     }
     const r_html = r_$(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
-    return $r.OK(r_html);
+    return outcomeIs.OK(r_html);
 
 }
 

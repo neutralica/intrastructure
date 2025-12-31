@@ -1,102 +1,128 @@
 // error-report.ts
 
-import { $r } from "../outcome/result.infra.js";
-import type { Result } from "../outcome/result.types.js";
-import { r_$ } from "../outcome/result.wrappers.js";
+import { outcomeIs } from "../outcome/outcome.infra.js";
+import type { Outcome } from "../outcome/outcome.types.js";
+import { r_$ } from "../outcome/outcome.wrappers.js";
 import type { ClientMeta, ServerMeta } from "../types/core.types.js";
-import { ErrSource, type ErrSeverity } from "./err-consts/err-consts.js";
+import { ErrSource, ErrSeverity } from "./err-consts/err-consts.js";
 import type { ErrData, RequiredData } from "./err-report.types.js";
 
+
 export default class ErrReport extends Error {
-    public message: string;
-    public module: string;
-    public severity: ErrSeverity;
-    public status?: string;
-    public stack: string; // one of your counterparts recommended making this readonly after creation?
-    public timestamp?: string;
-    public source?: ErrSource;
-    public metadata?: ClientMeta | ServerMeta;
+  public override message: string;
+  public module: string;
+  public severity: ErrSeverity;
+  public status?: string;
 
+  public override stack: string;
 
-    private constructor(
-        message: string,
-        module: string,
-        source: ErrSource,
-        severity: ErrSeverity,
-        partialdata?: Omit<ErrData, RequiredData>
-    ) {
-        super(message);
-        this.message = message;
-        this.module = module;
-        this.source = source ?? ErrSource.SYSTEM; // TODO change this back to just source, if exists
-        this.severity = severity;
-        this.timestamp = new Date().toISOString();
-        this.stack = new Error(message).stack ?? '(no trace available)';
+  public timestamp: string;
+  public source: ErrSource;
+  public metadata?: ClientMeta | ServerMeta;
 
-        Object.assign(this, partialdata);
-    }
+  private constructor(
+    message: string,
+    module: string,
+    source: ErrSource,
+    severity: ErrSeverity,
+    partial?: Partial<ErrData>
+  ) {
+    super(message);
 
-    public static create(data: ErrData): Result<ErrReport> {
-        const issues: string[] = []
-        if (data.message === undefined) {
-            issues.push('ErrorReport.new() requires message');
-        }
-        if (!data.module) {
-            issues.push('ErrorReport.new() requires module');
-        }
-        if (!data.source) {
-            issues.push('ErrorReport.new() requires source');
-        }
-        if (!data.severity) {
-            issues.push('ErrorReport.new() requires severity');
-        }
-        if (issues.length !== 0) {
-            throw new Error(issues.join(' / '));
-        }
-        const error: ErrReport = new ErrReport(
-            data.message as string,
-            data.module as string, // was Mod∆ but that's a DB specific thing
-            data.source as ErrSource,
-            data.severity as ErrSeverity,
-            data);
-        // console.error(error);
-        return $r.OK(error);
-    }
+    this.message = message;
+    this.module = module;
+    this.source = source;
+    this.severity = severity;
 
+    this.timestamp = new Date().toISOString();
+    this.stack = new Error(message).stack ?? "(no trace available)";
 
-    // these two methods feel like one is redundant:
-    public addMessage(newMessage: string): Result<ErrReport> {
-        return ErrReport.create({
-            message: `${this.message} | ${newMessage}`, // Append new message
-            module: this.module,
-            source: this.source || ErrSource.SYSTEM,
-            severity: this.severity
-        });
-    }
-    public addBreadCrumb(tag: string): Result<ErrReport> {
-        const prev = this.metadata?.breadcrumbs ?? [];
-        const enriched = [...prev, tag];
-        return ErrReport.create({
-            ...this,
-            metadata: {
-                ...this.metadata,
-                breadcrumbs: enriched,
-                enriched: true,
-            }
-        });
-    }
+    // Keep optional extras (status/metadata/etc)
+    if (partial) Object.assign(this, partial);
+  }
 
+  public static create(data: ErrData): ErrReport {
+    // Best-effort normalize
+    const msg =
+      typeof data.message === "string" && data.message.length > 0
+        ? data.message
+        : "(no message)";
 
+    const mod =
+      typeof data.module === "string" && data.module.length > 0
+        ? data.module
+        : "unknown";
+
+    //  required in types, but still normalize defensively.
+    const src: ErrSource = data.source ?? ErrSource.SYSTEM;
+
+    // If severity is missing/invalid, default to MED.
+    const sev: ErrSeverity = data.severity ?? ErrSeverity.MED;
+
+    // never throw; always construct
+    return new ErrReport(msg, mod, src, sev, data);
+  }
+
+  public addMessage(newMessage: string): ErrReport {
+    const suffix =
+      typeof newMessage === "string" && newMessage.length > 0
+        ? newMessage
+        : "(empty message)";
+
+    return ErrReport.create({
+      ...this.toData(),
+      message: `${this.message} | ${suffix}`,
+    });
+  }
+
+  public addBreadCrumb(tag: string): ErrReport {
+    const safeTag =
+      typeof tag === "string" && tag.length > 0 ? tag : "(empty tag)";
+
+    const meta = this.metadata ?? {};
+
+    // Tolerate old shapes (string) and coerce
+    const prevRaw = (meta as any).breadcrumbs;
+    const prev: string[] = Array.isArray(prevRaw)
+      ? prevRaw
+      : typeof prevRaw === "string" && prevRaw.length > 0
+        ? [prevRaw]
+        : [];
+
+    const enriched = [...prev, safeTag];
+
+    return ErrReport.create({
+      ...this.toData(),
+      metadata: {
+        ...(meta as any),
+        breadcrumbs: enriched,
+        enriched: true,
+      },
+    });
+  }
+
+  
+  private toData(): ErrData {
+    return {
+      message: this.message,
+      module: this.module,
+      source: this.source,
+      severity: this.severity,
+      status: this.status,
+      timestamp: this.timestamp,
+      // stack is not in ErrData in your snippet; add it if you want it carried.
+      metadata: this.metadata,
+    } as ErrData;
+  }
 }
-export function enrichResult<T>(
-    result: Result<T>,
-    stepId?: string
-): Result<T> {
-    if (!$r.is_xx(result)) return result;
-    if (result.err.metadata?.enriched) return result;
 
-    if (!stepId) return result;
+export function enrichOutcome<T>(outcome: Outcome<T>, stepId?: string): Outcome<T> {
+  if (!outcomeIs.failErr(outcome)) return outcome;
+  if (outcome.err.metadata?.enriched) return outcome;
+  if (!stepId) return outcome;
 
-    const enriched_err = r_$(result.err.addBreadCrumb(stepId));
-    return $r.XX(enriched_err.message, enriched_err);
+  const enrichedErr = outcome.err.addBreadCrumb(stepId);
+
+  // Preserve original message but swap the report
+  return outcomeIs.ERR(enrichedErr.message, enrichedErr);
 }

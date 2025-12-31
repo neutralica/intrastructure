@@ -1,0 +1,1 @@
+{"version":3,"file":"err-report.types.d.ts","sourceRoot":"","sources":["../../src/error-report/err-report.types.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,SAAS,MAAM,mBAAmB,CAAC;AAE/C;;;;GAIG;AACH,MAAM,MAAM,YAAY,GAAG,SAAS,GAAG,QAAQ,GAAG,QAAQ,GAAG,UAAU,CAAC;AAGxE,MAAM,MAAM,OAAO,GAAG,OAAO,CAAC;KACzB,CAAC,IAAI,MAAM,SAAS,GAAG,SAAS,CAAC,CAAC,CAAC;CACvC,CAAC,CAAC"}

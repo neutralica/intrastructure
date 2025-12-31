@@ -3,7 +3,7 @@
 
 // request-spec.ts
 
-import type { ResultAsync } from "../outcome/result.types.js";
+import type { OutcomeAsync } from "../outcome/outcome.types.js";
 
 export type N_ReqMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'PATCH' | 'OPTIONS';
 
@@ -117,7 +117,7 @@ export interface RequestBuilder<S> {
     asText(): RequestBuilder<S & JSONSpec>;
     asHTML(element?: string): RequestBuilder<S & HTMLDiscriminant>;
 
-    SEND(): ResultAsync<NetResponse>;
+    SEND(): OutcomeAsync<NetResponse>;
 }
 
 // export type Refined<S> = RequestBuilder<S>;

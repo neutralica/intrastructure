@@ -1,9 +1,9 @@
 // send-http.ts
 
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "../outcome/outcome.js";
+import { relai } from "../outcome/relai.js";
 import type { Outcome, OutcomeAsync } from "../outcome/outcome.types.js";
-import { wrap_data } from "../outcome/outcome.wrappers.js";
+import { wrap_data } from "../outcome/relai.wrappers.js";
 import type { NetRequestFull, NetResponse, NetworkRequestSpec } from "./net-request.types.js";
 
 
@@ -50,7 +50,7 @@ export default function Build_NetRequest(spec: NetworkRequestSpec): Outcome<NetR
 
     };
 
-    return outcomeIs.OK({
+    return relai.ok({
         url: fullURL,
         init,
         spec: spec
@@ -62,7 +62,7 @@ export async function Send_NetRequest(req: NetRequestFull): OutcomeAsync<NetResp
     try {
         const policy = req.spec.failBehavior;
         if (!policy) {
-            return outcomeIs.ERR('could not get policy');
+            return relai.err('could not get policy');
         }
 
         const fetchOnce = () => withTimeout(
@@ -73,13 +73,13 @@ export async function Send_NetRequest(req: NetRequestFull): OutcomeAsync<NetResp
         const res = await retry(fetchOnce, policy.retries, policy.retryDelayMs);
         const r_status = wrap_data(checkResponseStatus(res))
         if (r_status !== 'ok') {
-            return outcomeIs.ERR(`response not OK: ${r_status}`);
+            return relai.err(`response not OK: ${r_status}`);
         }
         const spec = req.spec;
-        return outcomeIs.OK({ spec, res });
+        return relai.ok({ spec, res });
     } catch (error) {
         console.error(format_err(error));
-        return outcomeIs.ERR(format_err(error));
+        return relai.err(format_err(error));
     }
 
 
@@ -106,17 +106,17 @@ function withTimeout<T>(task: Promise<T>, ms: number): Promise<T>{
  */
 export function checkResponseStatus(response: Response): Outcome<string> {
     if (response.status === 204) {
-        return outcomeIs.ERR('no content'); // Special handling for 204 No Content
+        return relai.err('no content'); // Special handling for 204 No Content
     } else if (response.status >= 300 && response.status < 400) {
-        return outcomeIs.ERR('redirect');
+        return relai.err('redirect');
     } else if (response.status >= 400 && response.status < 500) {
-        return outcomeIs.ERR('client error');  // Handle 4xx client errors
+        return relai.err('client error');  // Handle 4xx client errors
     } else if (response.status >= 500) {
-        return outcomeIs.ERR('server error');  // Handle 5xx server errors
+        return relai.err('server error');  // Handle 5xx server errors
     } else if (!response.ok) {
-        return outcomeIs.ERR('unknown error: !response.ok');  // Handle any non-OK responses
+        return relai.err('unknown error: !response.ok');  // Handle any non-OK responses
     }
-    return outcomeIs.OK('ok');  // If everything is OK
+    return relai.ok('ok');  // If everything is OK
 }
 
 
@@ -135,19 +135,19 @@ async function Parse_ExtractHTML(response: Response, element: string): OutcomeAs
 
     const container = html.querySelector(element);
     if (!(container instanceof HTMLElement)) {
-        return outcomeIs.ERR('container not found');
+        return relai.err('container not found');
     }
-    return outcomeIs.OK(container);
+    return relai.ok(container);
 }
 
 export async function Validate_HTMLRes({ spec, res }: NetResponse): OutcomeAsync<HTMLElement> {
 
     void wrap_data(checkResponseStatus(res), 'check response status');
     if (!spec.extractElement) {
-        return outcomeIs.ERR(`no element property given to extract`);
+        return relai.err(`no element property given to extract`);
     }
     const r_html = wrap_data(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
-    return outcomeIs.OK(r_html);
+    return relai.ok(r_html);
 
 }
 

@@ -1,7 +1,7 @@
 import { enrichOutcome } from "../error-report/error-report.js";
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "./outcome.js";
-import { validateOutcome, wrap_data, wrap_void } from "./outcome.wrappers.js";
+import { relai } from "./relai.js";
+import { validateOutcome, wrap_data, wrap_void } from "./relai.wrappers.js";
 function isOutcome(x) {
     return validateOutcome(x);
 }
@@ -12,10 +12,10 @@ export async function try_data(fn, msg) {
         if (isOutcome(v)) {
             return enrichOutcome(v, msg);
         }
-        return outcomeIs.OK(v);
+        return relai.ok(v);
     }
     catch (e) {
-        return outcomeIs.ERR(msg ?? "try_data caught exception", { message: format_err(e) });
+        return relai.err(msg ?? "try_data caught exception", { message: format_err(e) });
     }
 }
 // Moat: always returns Outcome<void>
@@ -26,10 +26,10 @@ export async function try_void(fn, msg) {
             return enrichOutcome(v, msg);
         }
         // raw void success
-        return outcomeIs.OK();
+        return relai.ok();
     }
     catch (e) {
-        return outcomeIs.ERR(msg ?? "try_void caught exception", { message: format_err(e) });
+        return relai.err(msg ?? "try_void caught exception", { message: format_err(e) });
     }
 }
 export async function must_data(fn, msg) {

@@ -4,4 +4,4 @@ export declare function wrap_data<T>(outcome: OutcomeAsync<T>, msg?: string): Pr
 export declare function wrap_void(outcome: Outcome<void>, msg?: string): OutcomeSuccessOnly;
 export declare function wrap_void(outcome: OutcomeAsync<void>, msg?: string): Promise<OutcomeSuccessOnly>;
 export declare function validateOutcome<T>(x: unknown): x is Outcome<T>;
-//# sourceMappingURL=outcome.wrappers.d.ts.map
+//# sourceMappingURL=relai.wrappers.d.ts.map

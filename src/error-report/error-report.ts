@@ -1,8 +1,8 @@
 // error-report.ts
 
-import { outcomeIs } from "../outcome/outcome.js";
+import { relai } from "../outcome/relai.js";
 import type { Outcome } from "../outcome/outcome.types.js";
-import { wrap_data } from "../outcome/outcome.wrappers.js";
+import { wrap_data } from "../outcome/relai.wrappers.js";
 import type { ClientMeta, ServerMeta } from "../types/core.types.js";
 import { ErrSource, ErrSeverity } from "./err-consts/err-consts.js";
 import type { ErrData, RequiredData } from "./err-report.types.js";
@@ -117,12 +117,12 @@ export default class ErrReport extends Error {
 }
 
 export function enrichOutcome<T>(outcome: Outcome<T>, stepId?: string): Outcome<T> {
-  if (!outcomeIs.failErr(outcome)) return outcome;
+  if (!relai.failErr(outcome)) return outcome;
   if (outcome.err.metadata?.enriched) return outcome;
   if (!stepId) return outcome;
 
   const enrichedErr = outcome.err.addBreadCrumb(stepId);
 
   // Preserve original message but swap the report
-  return outcomeIs.ERR(enrichedErr.message, enrichedErr);
+  return relai.err(enrichedErr.message, enrichedErr);
 }

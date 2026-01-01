@@ -1,9 +1,9 @@
 // net-request-wrappers.ts
 
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "../outcome/outcome.js";
+import { relai } from "../outcome/relai.js";
 import type { OutcomeAsync } from "../outcome/outcome.types.js";
-import { wrap_data } from "../outcome/outcome.wrappers.js";
+import { wrap_data } from "../outcome/relai.wrappers.js";
 import type { NetResponse } from "./net-request.types.js";
 import { checkResponseStatus, Validate_HTMLRes } from "./net-request.utils.js";
 
@@ -20,9 +20,9 @@ export async function n_wrapJSON(outcomePromise: OutcomeAsync<NetResponse>): Out
 
     try {
         const parsed = await r.res.json();
-        return outcomeIs.OK(parsed);
+        return relai.ok(parsed);
     } catch (error) {
-        return outcomeIs.ERR(format_err(error));
+        return relai.err(format_err(error));
     }
 
 }

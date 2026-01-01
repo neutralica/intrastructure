@@ -1,7 +1,7 @@
 // outcome.wrappers.ts
 
 import { enrichOutcome } from "../error-report/error-report.js";
-import { outcomeIs } from "./outcome.js";
+import { relai } from "./relai.js";
 import { NO_VAL, type Outcome, type OutcomeAsync, type OutcomeSuccessOnly } from "./outcome.types.js";
 
 
@@ -13,14 +13,14 @@ export function wrap_data<T>(
 ): T | Promise<T> {
     const handler = (resolved: Outcome<unknown>): T => {
         // CHANGE: message / naming
-        if (!validateOutcome(resolved)) throw outcomeIs.ERR(`wrap_data received non-Outcome value`);
+        if (!validateOutcome(resolved)) throw relai.err(`wrap_data received non-Outcome value`);
 
         const enriched = enrichOutcome(resolved);
 
-        if (outcomeIs.failErr(enriched)) throw enriched;
+        if (relai.failErr(enriched)) throw enriched;
 
-        if (outcomeIs.successOnly(enriched)) {
-            throw outcomeIs.ERR(msg ?? "successful Outcome with no data");
+        if (relai.successOnly(enriched)) {
+            throw relai.err(msg ?? "successful Outcome with no data");
         }
 
         return enriched.data as T;
@@ -38,11 +38,11 @@ export function wrap_void(outcome: Outcome<void> | OutcomeAsync<void>, msg?: str
     OutcomeSuccessOnly | Promise<OutcomeSuccessOnly> {
     const handler = (unknownOutcome: Outcome<unknown>): OutcomeSuccessOnly => {
         if (!validateOutcome(unknownOutcome)) {
-            throw outcomeIs.ERR(`r_$ received non-Outcome value`);
+            throw relai.err(`r_$ received non-Outcome value`);
         }
         const enriched = enrichOutcome(unknownOutcome);
-        if (outcomeIs.withData(enriched)) { throw outcomeIs.ERR('$Outcome<vøid> error: data not expected in Outcome<void>'); }
-        if (outcomeIs.failErr(enriched)) { throw enriched; }
+        if (relai.data(enriched)) { throw relai.err('$Outcome<vøid> error: data not expected in Outcome<void>'); }
+        if (relai.failErr(enriched)) { throw enriched; }
         return {
             success: true,
             data: NO_VAL,

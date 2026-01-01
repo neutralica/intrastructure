@@ -1,7 +1,7 @@
 // respond.infra.ts
 
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "../outcome/outcome.js";
+import { relai } from "../outcome/relai.js";
 import { NO_VAL, type OutcomeAsyncJSON, type OutcomeAsyncRender, type OutcomeAsyncSend, type OutcomeAsync } from "../outcome/outcome.types.js";
 import type {  HttpServerResponseLike, NextLike, ReqResNextHandler, TypedRequest } from "../types/http.types.js";
 
@@ -10,7 +10,7 @@ export const respond = {
     json: <T>(fn: (req: TypedRequest) => OutcomeAsyncJSON<T>): ReqResNextHandler =>
         async (req, res, next): Promise<void> => {
             const outcome = await checkOutcome(fn, req, res, next);
-            if (outcomeIs.withData(outcome)) {
+            if (relai.data(outcome)) {
                 res.json(outcome.data);
 
                 return;
@@ -21,12 +21,12 @@ export const respond = {
     send: (fn: (req: TypedRequest) => OutcomeAsyncSend): ReqResNextHandler =>
         async (req, res, next): Promise<void> => {
             const outcome = await checkOutcome(fn, req, res, next);
-            if (outcomeIs.successOnly(outcome)) {
+            if (relai.successOnly(outcome)) {
                 res.sendStatus(204);
 
                 return;
             }
-            if (outcomeIs.withData(outcome)) {
+            if (relai.data(outcome)) {
                 next(new Error('unexpected data payload in SEND'));
 
                 return;
@@ -40,7 +40,7 @@ export const respond = {
         fn: (req: TypedRequest) => OutcomeAsyncRender<T>): ReqResNextHandler =>
         async (req, res, next): Promise<void> => {
             const outcome = await checkOutcome(fn, req, res, next);
-            if (outcomeIs.withData(outcome)) {
+            if (relai.data(outcome)) {
                 if (typeof outcome.data === 'object' &&
                     outcome.data != NO_VAL &&
                     'view' in outcome.data &&
@@ -54,12 +54,12 @@ export const respond = {
 
                 return;
             }
-            if (outcomeIs.successOnly(outcome)) {
+            if (relai.successOnly(outcome)) {
                 next(new Error('cannot find required data'));
 
                 return;
             }
-            if (outcomeIs.failErr(outcome)) {
+            if (relai.failErr(outcome)) {
                 next(outcome.err);
             }
         },
@@ -67,7 +67,7 @@ export const respond = {
     auth: (fn: (req: TypedRequest) => OutcomeAsyncSend): ReqResNextHandler => 
         async (req, res, next) => {
             const outcome = await checkOutcome(fn, req, res, next);
-            if (outcomeIs.successOnly(outcome)) {
+            if (relai.successOnly(outcome)) {
                 console.log('debug — OK!');
                 res.redirect('/');
             } else {
@@ -85,11 +85,11 @@ const checkOutcome = async (
     next: NextLike
 ) => {
     try {
-        const outcome = await fn(req) ?? outcomeIs.ERR('processed function returned undefined');
+        const outcome = await fn(req) ?? relai.err('processed function returned undefined');
 
 
         return outcome;
     } catch (error) {
-        return outcomeIs.ERR(format_err(error));
+        return relai.err(format_err(error));
     }
 };

@@ -1,10 +1,10 @@
 import { enrichOutcome } from "../error-report/error-report.js";
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "./outcome.js";
+import { relai } from "./relai.js";
 import type { NoValue, Outcome, OutcomeSuccessOnly } from "./outcome.types.js";
-import { validateOutcome, wrap_data, wrap_void } from "./outcome.wrappers.js";
+import { validateOutcome, wrap_data, wrap_void } from "./relai.wrappers.js";
 
-type MaybePromise<T> = T | Promise<T>;
+// type MaybePromise<T> = T | Promise<T>;
 type MaybeOutcome<T> = T | Outcome<T>;
 type MaybeOutcomePromise<T> = MaybeOutcome<T> | Promise<MaybeOutcome<T>>;
 
@@ -24,9 +24,9 @@ export async function try_data<T>(
             return enrichOutcome(v, msg);
         }
 
-        return outcomeIs.OK(v as Exclude<T, NoValue>);
+        return relai.ok(v as Exclude<T, NoValue>);
     } catch (e) {
-        return outcomeIs.ERR(msg ?? "try_data caught exception", {message: format_err(e)});
+        return relai.err(msg ?? "try_data caught exception", {message: format_err(e)});
     }
 }
 
@@ -43,9 +43,9 @@ export async function try_void(
         }
 
         // raw void success
-        return outcomeIs.OK();
+        return relai.ok();
     } catch (e) {
-        return outcomeIs.ERR(msg ?? "try_void caught exception", {message: format_err(e)});
+        return relai.err(msg ?? "try_void caught exception", {message: format_err(e)});
     }
 }
 

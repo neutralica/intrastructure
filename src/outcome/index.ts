@@ -1,6 +1,6 @@
 // outcome index.ts
 
-export {outcomeIs} from './outcome.js'
-export * from './outcome.js';
-export * from './outcome.wrappers.js'; 
+export { relai } from './relai.js'
+export * from './relai.js';
+export * from './relai.wrappers.js';
 export * from './moat.wrappers.js';

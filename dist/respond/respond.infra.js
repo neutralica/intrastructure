@@ -1,11 +1,11 @@
 // respond.infra.ts
 import { format_err } from "../helpers/format-err.js";
-import { outcomeIs } from "../outcome/outcome.js";
+import { relai } from "../outcome/relai.js";
 import { NO_VAL } from "../outcome/outcome.types.js";
 export const respond = {
     json: (fn) => async (req, res, next) => {
         const outcome = await checkOutcome(fn, req, res, next);
-        if (outcomeIs.withData(outcome)) {
+        if (relai.data(outcome)) {
             res.json(outcome.data);
             return;
         }
@@ -13,11 +13,11 @@ export const respond = {
     },
     send: (fn) => async (req, res, next) => {
         const outcome = await checkOutcome(fn, req, res, next);
-        if (outcomeIs.successOnly(outcome)) {
+        if (relai.successOnly(outcome)) {
             res.sendStatus(204);
             return;
         }
-        if (outcomeIs.withData(outcome)) {
+        if (relai.data(outcome)) {
             next(new Error('unexpected data payload in SEND'));
             return;
         }
@@ -27,7 +27,7 @@ export const respond = {
     // conditional below and simplifies 
     render: (fn) => async (req, res, next) => {
         const outcome = await checkOutcome(fn, req, res, next);
-        if (outcomeIs.withData(outcome)) {
+        if (relai.data(outcome)) {
             if (typeof outcome.data === 'object' &&
                 outcome.data != NO_VAL &&
                 'view' in outcome.data &&
@@ -39,17 +39,17 @@ export const respond = {
             next(new Error('data payload misconfigured for RNDR'));
             return;
         }
-        if (outcomeIs.successOnly(outcome)) {
+        if (relai.successOnly(outcome)) {
             next(new Error('cannot find required data'));
             return;
         }
-        if (outcomeIs.failErr(outcome)) {
+        if (relai.failErr(outcome)) {
             next(outcome.err);
         }
     },
     auth: (fn) => async (req, res, next) => {
         const outcome = await checkOutcome(fn, req, res, next);
-        if (outcomeIs.successOnly(outcome)) {
+        if (relai.successOnly(outcome)) {
             console.log('debug — OK!');
             res.redirect('/');
         }
@@ -60,11 +60,11 @@ export const respond = {
 };
 const checkOutcome = async (fn, req, res, next) => {
     try {
-        const outcome = await fn(req) ?? outcomeIs.ERR('processed function returned undefined');
+        const outcome = await fn(req) ?? relai.err('processed function returned undefined');
         return outcome;
     }
     catch (error) {
-        return outcomeIs.ERR(format_err(error));
+        return relai.err(format_err(error));
     }
 };
 //# sourceMappingURL=respond.infra.js.map

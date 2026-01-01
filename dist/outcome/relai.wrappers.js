@@ -1,17 +1,17 @@
 // outcome.wrappers.ts
 import { enrichOutcome } from "../error-report/error-report.js";
-import { outcomeIs } from "./outcome.js";
+import { relai } from "./relai.js";
 import { NO_VAL } from "./outcome.types.js";
 export function wrap_data(outcome, msg) {
     const handler = (resolved) => {
         // CHANGE: message / naming
         if (!validateOutcome(resolved))
-            throw outcomeIs.ERR(`wrap_data received non-Outcome value`);
+            throw relai.err(`wrap_data received non-Outcome value`);
         const enriched = enrichOutcome(resolved);
-        if (outcomeIs.failErr(enriched))
+        if (relai.failErr(enriched))
             throw enriched;
-        if (outcomeIs.successOnly(enriched)) {
-            throw outcomeIs.ERR(msg ?? "successful Outcome with no data");
+        if (relai.successOnly(enriched)) {
+            throw relai.err(msg ?? "successful Outcome with no data");
         }
         return enriched.data;
     };
@@ -23,13 +23,13 @@ export function wrap_data(outcome, msg) {
 export function wrap_void(outcome, msg) {
     const handler = (unknownOutcome) => {
         if (!validateOutcome(unknownOutcome)) {
-            throw outcomeIs.ERR(`r_$ received non-Outcome value`);
+            throw relai.err(`r_$ received non-Outcome value`);
         }
         const enriched = enrichOutcome(unknownOutcome);
-        if (outcomeIs.withData(enriched)) {
-            throw outcomeIs.ERR('$Outcome<vøid> error: data not expected in Outcome<void>');
+        if (relai.data(enriched)) {
+            throw relai.err('$Outcome<vøid> error: data not expected in Outcome<void>');
         }
-        if (outcomeIs.failErr(enriched)) {
+        if (relai.failErr(enriched)) {
             throw enriched;
         }
         return {
@@ -51,4 +51,4 @@ export function validateOutcome(x) {
         "success" in x &&
         ((x.success === true) || (x.success === false)));
 }
-//# sourceMappingURL=outcome.wrappers.js.map
+//# sourceMappingURL=relai.wrappers.js.map

@@ -23,6 +23,6 @@ export type OutcomeAsyncRender<T extends Record<string, unknown> = {}> = Outcome
     view: string;
 } & T>;
 export type OutcomeAsyncSend = OutcomeAsync<OutcomeSuccessOnly>;
-export type NoValue = undefined;
+export type NoValue = '$NOVAL';
 export declare const NO_VAL: NoValue;
 //# sourceMappingURL=outcome.types.d.ts.map

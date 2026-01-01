@@ -38,7 +38,7 @@ function isErrData(x: unknown): x is ErrData {
 export const relai = {
   // ========= constructors =========
 
-  ok: <T>(data?: Exclude<T, NoValue>): Outcome<T> => {
+  ok: <T>(data ?: Exclude < T, NoValue>): Outcome<T> => {
     if (data === undefined) {
       return { success: true, data: NO_VAL, __only: true } as OutcomeSuccessOnly;
     }

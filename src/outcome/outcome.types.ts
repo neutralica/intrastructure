@@ -33,7 +33,7 @@ export type OutcomeAsyncRender<T extends Record<string, unknown> = {}> = Outcome
 export type OutcomeAsyncSend = OutcomeAsync<OutcomeSuccessOnly>;
 
 
-export type NoValue = undefined;
+export type NoValue = '$NOVAL';
 
 
-export const NO_VAL: NoValue = undefined;
+export const NO_VAL: NoValue = '$NOVAL';

@@ -42,7 +42,7 @@ export const respond = {
             const outcome = await checkOutcome(fn, req, res, next);
             if (relai.data(outcome)) {
                 if (typeof outcome.data === 'object' &&
-                    outcome.data != NO_VAL &&
+                    outcome.data != undefined &&
                     'view' in outcome.data &&
                     typeof outcome.data.view === 'string') {
                     const { view, ...locals } = outcome.data;

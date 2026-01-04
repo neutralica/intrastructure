@@ -1,11 +1,12 @@
 // error-report.ts
 
-import { relai } from "../outcome/relai.js";
+import { relay } from "../outcome/relay.js";
 import type { Outcome } from "../outcome/outcome.types.js";
-import { wrap_data } from "../outcome/relai.wrappers.js";
 import type { ClientMeta, ServerMeta } from "../types/core.types.js";
 import { ErrSource, ErrSeverity } from "./err-consts/err-consts.js";
-import type { ErrData, RequiredData } from "./err-report.types.js";
+import type { ErrData } from "./err-report.types.js";
+import { format_err } from "../helpers/format-err.js";
+import { outcome } from "../outcome/outcome.js";
 
 
 export default class ErrReport extends Error {
@@ -46,7 +47,7 @@ export default class ErrReport extends Error {
     const msg =
       typeof data.message === "string" && data.message.length > 0
         ? data.message
-        : "(no message)";
+        : "(/)";
 
     const mod =
       typeof data.module === "string" && data.module.length > 0
@@ -65,23 +66,28 @@ export default class ErrReport extends Error {
 
   public addMessage(newMessage: string): ErrReport {
     const suffix =
-      typeof newMessage === "string" && newMessage.length > 0
-        ? newMessage
-        : "(empty message)";
+      typeof newMessage === "string" ? newMessage.trim() : "";
+
+    if (suffix.length === 0) return this;
+
+    const base = this.message.trim();
+
+    // CHANGE: if it's the same message, don't double it
+    if (suffix === base) return this;
+
+    // CHANGE: use newline, not pipes
+    const nextMsg = `${base}\n${suffix}`;
 
     return ErrReport.create({
       ...this.toData(),
-      message: `${this.message} | ${suffix}`,
+      message: nextMsg,
     });
   }
 
-  public addBreadCrumb(tag: string): ErrReport {
-    const safeTag =
-      typeof tag === "string" && tag.length > 0 ? tag : "(empty tag)";
-
+  public addTrace(tag: string): ErrReport {
+    const safeTag = typeof tag === "string" && tag.length > 0 ? tag : "(empty tag)";
     const meta = this.metadata ?? {};
 
-    // Tolerate old shapes (string) and coerce
     const prevRaw = (meta as any).breadcrumbs;
     const prev: string[] = Array.isArray(prevRaw)
       ? prevRaw
@@ -89,19 +95,21 @@ export default class ErrReport extends Error {
         ? [prevRaw]
         : [];
 
-    const enriched = [...prev, safeTag];
+    // de-dupe
+    const breadcrumbs = prev.includes(safeTag) ? prev : [...prev, safeTag];
 
     return ErrReport.create({
       ...this.toData(),
+      // CRITICAL: do not change `message` here.
       metadata: {
         ...(meta as any),
-        breadcrumbs: enriched,
+        breadcrumbs,
         enriched: true,
       },
     });
   }
 
-  
+
   private toData(): ErrData {
     return {
       message: this.message,
@@ -116,13 +124,21 @@ export default class ErrReport extends Error {
   }
 }
 
-export function enrichOutcome<T>(outcome: Outcome<T>, stepId?: string): Outcome<T> {
-  if (!relai.failErr(outcome)) return outcome;
-  if (outcome.err.metadata?.enriched) return outcome;
-  if (!stepId) return outcome;
+// CHANGE: take and return Outcome<T>
 
-  const enrichedErr = outcome.err.addBreadCrumb(stepId);
+export function enrichOutcome<T>(oc: Outcome<T>, stepId?: string): Outcome<T> {
+  if (!stepId) return oc;
+  if (!outcome.isErr(oc)) return oc;
 
-  // Preserve original message but swap the report
-  return relai.err(enrichedErr.message, enrichedErr);
+  // If already enriched with this step, skip (optional but nice)
+  const meta = oc.err.metadata ?? {};
+  const prev = Array.isArray((meta as any).breadcrumbs) ? (meta as any).breadcrumbs : [];
+  if (prev.includes(stepId)) return oc;
+
+  // IMPORTANT: do not call relay.err here.
+  // Just return the same Outcome, with an updated ErrReport.
+  return {
+    ...oc,
+    err: oc.err.addTrace(stepId), // should be metadata-only
+  } as Outcome<T>;
 }

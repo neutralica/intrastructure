@@ -1,5 +1,5 @@
 import type { N_request, FailRecoveryMode } from "./net-request.types.js";
-export declare const $n: {
+export declare const netReq: {
     NewNetRequest: () => {
         GET: () => N_request<{
             method: "GET";

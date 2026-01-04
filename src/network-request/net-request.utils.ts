@@ -1,13 +1,18 @@
 // send-http.ts
 
 import { format_err } from "../helpers/format-err.js";
-import { relai } from "../outcome/relai.js";
+import { relay } from "../outcome/relay.js";
 import type { Outcome, OutcomeAsync } from "../outcome/outcome.types.js";
-import { wrap_data } from "../outcome/relai.wrappers.js";
+import { wrap_data } from "../outcome/relay.wrappers.js";
 import type { NetRequestFull, NetResponse, NetworkRequestSpec } from "./net-request.types.js";
+import { outcome } from "../outcome/outcome.js";
 
+export function checkResponseStatus(response: Response): Outcome<void> {
+    if (!response.ok) return relay.err(`HTTP ${response.status}`);
+    return relay.ok(); // success-only
+}
 
-export default function Build_NetRequest(spec: NetworkRequestSpec): Outcome<NetRequestFull> {
+export default function build_net_req(spec: NetworkRequestSpec): Outcome<NetRequestFull> {
     const {
         method,
         url,
@@ -50,7 +55,7 @@ export default function Build_NetRequest(spec: NetworkRequestSpec): Outcome<NetR
 
     };
 
-    return relai.ok({
+    return relay.data({
         url: fullURL,
         init,
         spec: spec
@@ -58,11 +63,11 @@ export default function Build_NetRequest(spec: NetworkRequestSpec): Outcome<NetR
 
 }
 
-export async function Send_NetRequest(req: NetRequestFull): OutcomeAsync<NetResponse> {
+export async function send_net_req(req: NetRequestFull): OutcomeAsync<NetResponse> {
     try {
         const policy = req.spec.failBehavior;
         if (!policy) {
-            return relai.err('could not get policy');
+            return relay.err('could not get policy');
         }
 
         const fetchOnce = () => withTimeout(
@@ -71,21 +76,22 @@ export async function Send_NetRequest(req: NetRequestFull): OutcomeAsync<NetResp
         );
 
         const res = await retry(fetchOnce, policy.retries, policy.retryDelayMs);
-        const r_status = wrap_data(checkResponseStatus(res))
-        if (r_status !== 'ok') {
-            return relai.err(`response not OK: ${r_status}`);
+        const statusOk = checkResponseStatus(res);
+        if (outcome.isErr(statusOk)) {
+            // CHANGE: convert Outcome<void> failure into Outcome<NetResponse> failure
+            return relay.err("response not OK", statusOk.err);
         }
         const spec = req.spec;
-        return relai.ok({ spec, res });
+        return relay.data({ spec, res });
     } catch (error) {
         console.error(format_err(error));
-        return relai.err(format_err(error));
+        return relay.err(format_err(error));
     }
 
 
 }
 
-function withTimeout<T>(task: Promise<T>, ms: number): Promise<T>{
+function withTimeout<T>(task: Promise<T>, ms: number): Promise<T> {
     return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
             reject(new Error(`timed out after ${ms} ms`));
@@ -102,25 +108,6 @@ function withTimeout<T>(task: Promise<T>, ms: number): Promise<T>{
 }
 
 /**
- * check response status code
- */
-export function checkResponseStatus(response: Response): Outcome<string> {
-    if (response.status === 204) {
-        return relai.err('no content'); // Special handling for 204 No Content
-    } else if (response.status >= 300 && response.status < 400) {
-        return relai.err('redirect');
-    } else if (response.status >= 400 && response.status < 500) {
-        return relai.err('client error');  // Handle 4xx client errors
-    } else if (response.status >= 500) {
-        return relai.err('server error');  // Handle 5xx server errors
-    } else if (!response.ok) {
-        return relai.err('unknown error: !response.ok');  // Handle any non-OK responses
-    }
-    return relai.ok('ok');  // If everything is OK
-}
-
-
-/**
  * parse response & find {(element)} within body
  * - accepts Response
  * - converts Response to plaintext
@@ -135,19 +122,19 @@ async function Parse_ExtractHTML(response: Response, element: string): OutcomeAs
 
     const container = html.querySelector(element);
     if (!(container instanceof HTMLElement)) {
-        return relai.err('container not found');
+        return relay.err('container not found');
     }
-    return relai.ok(container);
+    return relay.data(container);
 }
 
-export async function Validate_HTMLRes({ spec, res }: NetResponse): OutcomeAsync<HTMLElement> {
+export async function validate_response({ spec, res }: NetResponse): OutcomeAsync<HTMLElement> {
 
     void wrap_data(checkResponseStatus(res), 'check response status');
     if (!spec.extractElement) {
-        return relai.err(`no element property given to extract`);
+        return relay.err(`no element property given to extract`);
     }
     const r_html = wrap_data(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
-    return relai.ok(r_html);
+    return relay.data(r_html);
 
 }
 
@@ -157,7 +144,7 @@ export async function retry<T>(
     delayMs = 0,
 ): Promise<T> {
     let lastErr: unknown;
-    for (let i = 0; i < maxAttempts; i++){
+    for (let i = 0; i < maxAttempts; i++) {
         try {
             return await task();
         } catch (error) {
@@ -166,7 +153,7 @@ export async function retry<T>(
         }
     }
     throw lastErr;
-    
+
 }
 
 function wait(ms: number) {

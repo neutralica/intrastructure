@@ -1,32 +1,32 @@
 // network-request.infra.ts
-import { relai } from "../outcome/relai.js";
-import { wrap_data } from "../outcome/relai.wrappers.js";
+import { relay } from "../outcome/relay.js";
+import { wrap_data } from "../outcome/relay.wrappers.js";
 import { RetryPresetΔ } from "./net-request.consts.js";
-import Build_NetRequest, { Send_NetRequest } from "./net-request.utils.js";
-export const $n = {
+import build_net_req, { send_net_req } from "./net-request.utils.js";
+export const netReq = {
     NewNetRequest: () => ({
-        GET: () => n_wrap({ method: 'GET', failBehavior: RetryPresetΔ.DEFAULT }),
-        POST: () => n_wrap({ method: 'POST', failBehavior: RetryPresetΔ.DEFAULT }),
-        PUT: () => n_wrap({ method: 'PUT', failBehavior: RetryPresetΔ.DEFAULT }),
-        DELETE: () => n_wrap({ method: 'DELETE', failBehavior: RetryPresetΔ.DEFAULT }),
+        GET: () => wrapNetReq({ method: 'GET', failBehavior: RetryPresetΔ.DEFAULT }),
+        POST: () => wrapNetReq({ method: 'POST', failBehavior: RetryPresetΔ.DEFAULT }),
+        PUT: () => wrapNetReq({ method: 'PUT', failBehavior: RetryPresetΔ.DEFAULT }),
+        DELETE: () => wrapNetReq({ method: 'DELETE', failBehavior: RetryPresetΔ.DEFAULT }),
     }),
 };
 function isNetRequestSpec(spec) {
     return (typeof spec.url === 'string' &&
         typeof spec.method === 'string');
 }
-function n_wrap(spec) {
+function wrapNetReq(spec) {
     return {
         ...spec,
         to(url) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url
                 // HTMLDiscriminant as a catch all is not correct for all cases TODO
             });
         },
         getIngredView() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url: '/view/ingredients',
                 expectHTML: true,
@@ -37,7 +37,7 @@ function n_wrap(spec) {
             });
         },
         getHomeScreen() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url: '/view/home',
                 expectHTML: true,
@@ -48,7 +48,7 @@ function n_wrap(spec) {
             });
         },
         getGraph() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url: '/api/graph/',
                 expectHTML: true,
@@ -59,7 +59,7 @@ function n_wrap(spec) {
             });
         },
         getState() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url: '/api/status',
             });
@@ -71,7 +71,7 @@ function n_wrap(spec) {
         //     });
         // },
         withQuery(query) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 query: {
                     ...(query ?? {}),
@@ -80,14 +80,14 @@ function n_wrap(spec) {
             });
         },
         withBody(body) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 body
                 // S may or may not be the correct generic here?
             });
         },
         withHeaders(headers) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 headers: {
                     ...(spec.headers ?? {}),
@@ -97,13 +97,13 @@ function n_wrap(spec) {
         },
         // TODO - I notice asJSON and asHTML don't enforce return types
         asJSON() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 expectJSON: true,
             });
         },
         asText() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 expectJSON: false,
                 // TODO— *not* JSONSPec
@@ -111,7 +111,7 @@ function n_wrap(spec) {
         },
         // TODO - I notice asJSON and asHTML don't enforce return types 
         asHTML(extract = '.response-container') {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 expectHTML: true,
                 extractElement: extract,
@@ -122,7 +122,7 @@ function n_wrap(spec) {
             });
         },
         onFailure(failBehavior) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 failBehavior,
             });
@@ -130,10 +130,10 @@ function n_wrap(spec) {
         SEND() {
             if (!isNetRequestSpec(spec)) {
                 // 'throw' required here rather than return (which errors) - investigate (todo)
-                throw relai.err('no url or method on NetReq');
+                throw relay.err('no url or method on NetReq');
             }
-            const r_netreq = wrap_data(Build_NetRequest(spec));
-            return Send_NetRequest(r_netreq);
+            const netreq = wrap_data(build_net_req(spec));
+            return send_net_req(netreq);
         },
         // withMeta(meta: Record<string, unknown>) {}
         // toLogin(){}

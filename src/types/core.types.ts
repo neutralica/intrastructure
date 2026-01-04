@@ -18,7 +18,7 @@ export interface ClientMeta {
   pid?: number;
   uptime?: number;
   href?: string;
-  breadcrumbs?: string[];
+  trace?: string[];
   enriched?: boolean;
 
   [key: string]: MetaValue;
@@ -44,6 +44,6 @@ export interface ServerMeta {
   userAgent: string;
   requestID: string;
   platform?: string;
-  breadcrumbs?: string[];
+  trace?: string[];
   enriched?: boolean;
 }

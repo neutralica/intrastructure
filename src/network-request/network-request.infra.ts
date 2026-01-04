@@ -1,17 +1,17 @@
 // network-request.infra.ts
 
-import { relai } from "../outcome/relai.js";
-import { wrap_data } from "../outcome/relai.wrappers.js";
+import { relay } from "../outcome/relay.js";
+import { wrap_data } from "../outcome/relay.wrappers.js";
 import { RetryPresetΔ } from "./net-request.consts.js";
-import type { BodySpec, FailSpec, HeaderSpec, HTMLDiscriminant, HTMLSpec, JSONDiscriminant, JSONSpec, N_partial, N_request, NetworkRequestSpec, QuerySpec, RequestBuilder, URLSpec, FailRecoveryMode } from "./net-request.types.js";
-import Build_NetRequest, { Send_NetRequest } from "./net-request.utils.js";
+import type { BodySpec, FailSpec, HeaderSpec, HTMLDiscriminant, HTMLSpec, JSONDiscriminant, JSONSpec, N_partial, N_request, NetworkRequestSpec, QuerySpec, RequestBuilder, URLSpec, FailRecoveryMode, NetRequestFull } from "./net-request.types.js";
+import build_net_req, { send_net_req } from "./net-request.utils.js";
 
-export const $n = {
+export const netReq = {
     NewNetRequest: () => ({
-        GET: () => n_wrap({ method: 'GET', failBehavior: RetryPresetΔ.DEFAULT  as FailRecoveryMode}),
-        POST: () => n_wrap({ method: 'POST', failBehavior: RetryPresetΔ.DEFAULT as FailRecoveryMode }),
-        PUT: () => n_wrap({ method: 'PUT', failBehavior: RetryPresetΔ.DEFAULT  as FailRecoveryMode}),
-        DELETE: () => n_wrap({ method: 'DELETE', failBehavior: RetryPresetΔ.DEFAULT  as FailRecoveryMode}),
+        GET: () => wrapNetReq({ method: 'GET', failBehavior: RetryPresetΔ.DEFAULT  as FailRecoveryMode}),
+        POST: () => wrapNetReq({ method: 'POST', failBehavior: RetryPresetΔ.DEFAULT as FailRecoveryMode }),
+        PUT: () => wrapNetReq({ method: 'PUT', failBehavior: RetryPresetΔ.DEFAULT  as FailRecoveryMode}),
+        DELETE: () => wrapNetReq({ method: 'DELETE', failBehavior: RetryPresetΔ.DEFAULT  as FailRecoveryMode}),
     }),
 };
 
@@ -23,12 +23,12 @@ function isNetRequestSpec(spec: N_partial): spec is NetworkRequestSpec {
 
 }
 
-function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
+function wrapNetReq<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
     return {
         ...spec,
 
         to(url: string) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url
                 // HTMLDiscriminant as a catch all is not correct for all cases TODO
@@ -36,7 +36,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         },
 
         getIngredView() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url: '/view/ingredients',
                 expectHTML: true,
@@ -48,7 +48,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         },
 
         getHomeScreen() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url: '/view/home',
                 expectHTML: true,
@@ -60,7 +60,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         },
 
         getGraph() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url: '/api/graph/',
                 expectHTML: true,
@@ -71,7 +71,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
             }) as RequestBuilder<S & URLSpec & HTMLDiscriminant>;
         },
         getState() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 url: '/api/status',
             }) as RequestBuilder<S & URLSpec & JSONDiscriminant>;
@@ -85,7 +85,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         // },
 
         withQuery(query: Record<string, unknown>) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 query: {
                     ...(query ?? {}),
@@ -95,7 +95,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         },
 
         withBody(body: unknown) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 body
                 // S may or may not be the correct generic here?
@@ -103,7 +103,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         },
 
         withHeaders(headers: Record<string, string>) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 headers: {
                     ...(spec.headers ?? {}),
@@ -114,14 +114,14 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
 
         // TODO - I notice asJSON and asHTML don't enforce return types
         asJSON() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 expectJSON: true,
             }) as RequestBuilder<S & JSONSpec>;
         },
 
         asText() {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 expectJSON: false,
                 // TODO— *not* JSONSPec
@@ -129,7 +129,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         },
         // TODO - I notice asJSON and asHTML don't enforce return types 
         asHTML(extract = '.response-container') {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 expectHTML: true,
                 extractElement: extract,
@@ -141,7 +141,7 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         },
 
         onFailure(failBehavior: FailRecoveryMode) {
-            return n_wrap({
+            return wrapNetReq({
                 ...spec,
                 failBehavior,
 
@@ -152,10 +152,10 @@ function n_wrap<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S> {
         SEND() {
             if (!isNetRequestSpec(spec)) {
                 // 'throw' required here rather than return (which errors) - investigate (todo)
-                throw relai.err('no url or method on NetReq');
+                throw relay.err('no url or method on NetReq');
             }
-            const r_netreq = wrap_data(Build_NetRequest(spec));
-            return Send_NetRequest(r_netreq);
+            const netreq: NetRequestFull = wrap_data(build_net_req(spec));
+            return send_net_req(netreq);
         },
         // withMeta(meta: Record<string, unknown>) {}
         // toLogin(){}

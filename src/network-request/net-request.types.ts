@@ -5,6 +5,7 @@
 
 import type { OutcomeAsync } from "../outcome/outcome.types.js";
 
+
 export type N_ReqMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'PATCH' | 'OPTIONS';
 
 export enum NetRetryΔ {

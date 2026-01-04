@@ -1,17 +1,17 @@
 // net-request-wrappers.ts
 
 import { format_err } from "../helpers/format-err.js";
-import { relai } from "../outcome/relai.js";
+import { relay } from "../outcome/relay.js";
 import type { OutcomeAsync } from "../outcome/outcome.types.js";
-import { wrap_data } from "../outcome/relai.wrappers.js";
+import { wrap_data } from "../outcome/relay.wrappers.js";
 import type { NetResponse } from "./net-request.types.js";
-import { checkResponseStatus, Validate_HTMLRes } from "./net-request.utils.js";
+import { checkResponseStatus, validate_response } from "./net-request.utils.js";
 
-export async function n_wrapHTML(outcomePromise: OutcomeAsync<NetResponse>
+export async function wrap_html_netreq(outcomePromise: OutcomeAsync<NetResponse>
 ): Promise<HTMLElement> {
-    const r_outcome = wrap_data(await outcomePromise);
-    const element = wrap_data(await Validate_HTMLRes(r_outcome));
-    return element;
+    const oc = wrap_data(await outcomePromise);
+    const el = wrap_data(await validate_response(oc));
+    return el;
 }
 
 export async function n_wrapJSON(outcomePromise: OutcomeAsync<NetResponse>): OutcomeAsync<object> {
@@ -20,9 +20,9 @@ export async function n_wrapJSON(outcomePromise: OutcomeAsync<NetResponse>): Out
 
     try {
         const parsed = await r.res.json();
-        return relai.ok(parsed);
+        return relay.data(parsed);
     } catch (error) {
-        return relai.err(format_err(error));
+        return relay.err(format_err(error));
     }
 
 }

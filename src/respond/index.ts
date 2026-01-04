@@ -1,3 +1,3 @@
 // respond index.ts
 
-export * from './respond.infra.js';
+export * from './respond.js';

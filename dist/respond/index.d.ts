@@ -1,2 +1,2 @@
-export * from './respond.infra.js';
+export * from './respond.js';
 //# sourceMappingURL=index.d.ts.map

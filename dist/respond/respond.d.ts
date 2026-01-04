@@ -6,4 +6,4 @@ export declare const respond: {
     render: <T extends Record<string, unknown>>(fn: (req: TypedRequest) => OutcomeAsyncRender<T>) => ReqResNextHandler;
     auth: (fn: (req: TypedRequest) => OutcomeAsyncSend) => ReqResNextHandler;
 };
-//# sourceMappingURL=respond.infra.d.ts.map
+//# sourceMappingURL=respond.d.ts.map

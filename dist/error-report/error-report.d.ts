@@ -14,8 +14,8 @@ export default class ErrReport extends Error {
     private constructor();
     static create(data: ErrData): ErrReport;
     addMessage(newMessage: string): ErrReport;
-    addBreadCrumb(tag: string): ErrReport;
+    addTrace(tag: string): ErrReport;
     private toData;
 }
-export declare function enrichOutcome<T>(outcome: Outcome<T>, stepId?: string): Outcome<T>;
+export declare function enrichOutcome<T>(oc: Outcome<T>, stepId?: string): Outcome<T>;
 //# sourceMappingURL=error-report.d.ts.map

@@ -1,3 +1,3 @@
 // node index.ts
-export * from "../respond/index.js";
+export * from "../core/respond/index.js";
 //# sourceMappingURL=index.js.map

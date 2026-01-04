@@ -1,4 +1,4 @@
-import type { ServerMeta as ServerMetaCore } from "./core.types.js";
+import type { ServerMeta as ServerMetaCore } from "./network.types.js";
 export interface ServerMeta extends Omit<ServerMetaCore, "memoryUsage"> {
     memoryUsage: NodeJS.MemoryUsage;
 }

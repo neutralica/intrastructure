@@ -1,22 +1,9 @@
-import type { Outcome, OutcomeSuccessOnly } from "./outcome.types.js";
+import type { Outcome } from "./outcome.types.js";
+export declare function data_sync<T>(fn: () => T | Outcome<T>, step?: string): Outcome<T>;
+export declare function void_sync(fn: () => void | Outcome<void>, step?: string): Outcome<void>;
 /**
- * Either a raw payload OR an Outcome<T>.
- * The moat accepts both and normalizes to Outcome<T>.
+ * Async wrappers (thin)
  */
-type MaybeOutcome<T> = T | Outcome<T>;
-type MaybeOutcomePromise<T> = MaybeOutcome<T> | Promise<MaybeOutcome<T>>;
-/**
- * Moat: always returns Outcome<T>
- */
-export declare function try_data<T>(fn: () => MaybeOutcomePromise<T>, step?: string): Promise<Outcome<T>>;
-/**
- * Moat: always returns Outcome<void>
- */
-export declare function try_void(fn: () => MaybeOutcomePromise<void>, step?: string): Promise<Outcome<void>>;
-/**
- * must_*: developer-facing “blow up on failure” helpers
- */
-export declare function must_data<T>(fn: () => MaybeOutcomePromise<T>, step?: string): Promise<T>;
-export declare function must_void(fn: () => MaybeOutcomePromise<void>, step?: string): Promise<OutcomeSuccessOnly>;
-export {};
+export declare function data_async<T>(fn: () => Promise<T | Outcome<T>>, step?: string): Promise<Outcome<T>>;
+export declare function void_async(fn: () => Promise<void | Outcome<void>>, step?: string): Promise<Outcome<void>>;
 //# sourceMappingURL=outcome.wrappers.d.ts.map

@@ -52,67 +52,85 @@ function ensure_methods<T>(o: Outcome<T>): Outcome<T> {
   return relay.err("ensure_methods received non-Outcome-ish value", anyO) as Outcome<T>;
 }
 
-/**
- * Moat: always returns Outcome<T>
- */
-export async function try_data<T>(
-  fn: () => MaybeOutcomePromise<T>,
+export function data_sync<T>(
+  fn: () => T | Outcome<T>,
   step?: string
-): Promise<Outcome<T>> {
+): Outcome<T> {
   try {
-    const v = await fn();
+    const v = fn();
 
     if (isOutcomeShape(v)) {
-      // CHANGE: normalize + enrich
       const o = ensure_methods(v);
       return enrichOutcome(o, step);
     }
 
-    // CHANGE: raw payload -> OK
     return relay.data(v as Exclude<T, NoValue>);
   } catch (e) {
-    // CHANGE: let relay.make.err handle unknown causes
-    return relay.err(step ?? "try_data caught exception", e) as Outcome<T>;
+    return relay.err(step ?? "data_sync caught exception", e) as Outcome<T>;
   }
 }
 
-/**
- * Moat: always returns Outcome<void>
- */
-export async function try_void(
-  fn: () => MaybeOutcomePromise<void>,
+
+export function void_sync(
+  fn: () => void | Outcome<void>,
   step?: string
-): Promise<Outcome<void>> {
+): Outcome<void> {
   try {
-    const v = await fn();
+    const v = fn();
 
     if (isOutcomeShape(v)) {
       const o = ensure_methods(v as Outcome<void>);
       return enrichOutcome(o, step);
     }
 
-    // raw void success
     return relay.ok() as Outcome<void>;
   } catch (e) {
-    return relay.err(step ?? "try_void caught exception", e) as Outcome<void>;
+    return relay.err(step ?? "void_sync caught exception", e) as Outcome<void>;
+  }
+}
+/**
+ * Async wrappers (thin)
+ */
+export async function data_async<T>(
+  fn: () => Promise<T | Outcome<T>>,
+  step?: string
+): Promise<Outcome<T>> {
+  try {
+    const v = await fn();
+    // reuse sync moat by passing a sync thunk returning the resolved value
+    return data_sync(() => v, step);
+  } catch (e) {
+    return relay.err(step ?? "data_async caught exception", e) as Outcome<T>;
   }
 }
 
-/**
- * must_*: developer-facing “blow up on failure” helpers
- */
-export async function must_data<T>(
-  fn: () => MaybeOutcomePromise<T>,
+export async function void_async(
+  fn: () => Promise<void | Outcome<void>>,
   step?: string
-): Promise<T> {
-  const o = await try_data(fn, step);
-  return wrap_data(o, step);
+): Promise<Outcome<void>> {
+  try {
+    const v = await fn();
+    return void_sync(() => v, step);
+  } catch (e) {
+    return relay.err(step ?? "void_async caught exception", e) as Outcome<void>;
+  }
 }
 
-export async function must_void(
-  fn: () => MaybeOutcomePromise<void>,
-  step?: string
-): Promise<OutcomeSuccessOnly> {
-  const o = await try_void(fn, step);
-  return wrap_void(o, step);
-}
+// /**
+//  * must_*: developer-facing “blow up on failure” helpers
+//  */
+// export async function must_data<T>(
+//   fn: () => MaybeOutcomePromise<T>,
+//   step?: string
+// ): Promise<T> {
+//   const o = await try_data(fn, step);
+//   return wrap_data(o, step);
+// }
+
+// export async function must_void(
+//   fn: () => MaybeOutcomePromise<void>,
+//   step?: string
+// ): Promise<OutcomeSuccessOnly> {
+//   const o = await try_void(fn, step);
+//   return wrap_void(o, step);
+// }

@@ -2,7 +2,7 @@ import { NO_VAL } from "./outcome.types.js";
 import { relay } from "./relay.js";
 import { outcome } from "./outcome.js";
 import { enrichOutcome } from "../error-report/error-report.js";
-export function wrap_data(o, step) {
+export function relay_data(o, step) {
     const handler = (x) => {
         const e = enrichOutcome(x, step);
         if (outcome.isErr(e))
@@ -16,7 +16,7 @@ export function wrap_data(o, step) {
     };
     return o instanceof Promise ? o.then(handler) : handler(o);
 }
-export function wrap_void(o, step) {
+export function relay_void(o, step) {
     const handler = (x) => {
         const e = enrichOutcome(x, step);
         if (outcome.isErr(e))
@@ -29,7 +29,7 @@ export function wrap_void(o, step) {
         if (outcome.isOK(e))
             return e;
         // Defensive: should be unreachable if your union is correct
-        throw relay.err(step ?? "invalid Outcome<void> state").err;
+        throw relay.err(step ?? "invalid Outcome<void> state");
     };
     return o instanceof Promise ? o.then(handler) : handler(o);
 }

@@ -7,15 +7,24 @@ export const NO_VAL: NoValue = "$NOVAL";
 export type Payload<T> = T extends NoValue ? never : T;
 
 // variants
-export type OutcomeDataSuccess<T> = { success: true; data: T };
-export type OutcomeSuccessOnly = { success: true; data: NoValue; __only: true };
-export type OutcomeFailErr = { success: false; err: ErrReport; __fail: true };
+export type OutcomeData<T> = { success: true; data: T };
+export type OutcomeVoid = { success: true; data: NoValue; __only: true };
+export type OutcomeErr = { success: false; err: ErrReport; __fail: true };
 
 // core union
 export type Outcome<T> =
-  | OutcomeDataSuccess<T>
-  | OutcomeSuccessOnly
-  | OutcomeFailErr;
+  | OutcomeData<T>
+  | OutcomeVoid
+  | OutcomeErr;
+
+export type OutcomeMaybeData<T> =
+  | OutcomeData<T>
+  | OutcomeErr;
+
+export type OutcomeMaybeVoid =
+  | OutcomeVoid
+  | OutcomeErr;
+
 
 // async alias (this is the “OutcomeAsync” you’re asking about)
 export type OutcomeAsync<T> = Promise<Outcome<T>>;

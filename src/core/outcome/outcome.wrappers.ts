@@ -1,9 +1,9 @@
 // outcome.wrappers.ts
 
-import type { Outcome, OutcomeSuccessOnly, NoValue } from "./outcome.types.js";
+import type { Outcome, OutcomeVoid, NoValue } from "./outcome.types.js";
 import { relay } from "./relay.js";
 import { enrichOutcome } from "../error-report/error-report.js";
-import { wrap_data, wrap_void } from "./relay.wrappers.js";
+import { relay_data, relay_void } from "./relay.wrappers.js";
 
 /**
  * Either a raw payload OR an Outcome<T>.
@@ -88,6 +88,7 @@ export function void_sync(
     return relay.err(step ?? "void_sync caught exception", e) as Outcome<void>;
   }
 }
+
 /**
  * Async wrappers (thin)
  */

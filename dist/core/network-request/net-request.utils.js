@@ -1,7 +1,7 @@
 // send-http.ts
 import { format_err } from "../../helpers/format-err.js";
 import { relay } from "../outcome/relay.js";
-import { wrap_data } from "../outcome/relay.wrappers.js";
+import { relay_data } from "../outcome/relay.wrappers.js";
 import { outcome } from "../outcome/outcome.js";
 export function checkResponseStatus(response) {
     if (!response.ok)
@@ -94,11 +94,11 @@ async function Parse_ExtractHTML(response, element) {
     return relay.data(container);
 }
 export async function validate_response({ spec, res }) {
-    void wrap_data(checkResponseStatus(res), 'check response status');
+    void relay_data(checkResponseStatus(res), 'check response status');
     if (!spec.extractElement) {
         return relay.err(`no element property given to extract`);
     }
-    const r_html = wrap_data(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
+    const r_html = relay_data(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
     return relay.data(r_html);
 }
 export async function retry(task, maxAttempts, delayMs = 0) {

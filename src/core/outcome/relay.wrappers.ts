@@ -1,13 +1,13 @@
-import type { Outcome, OutcomeAsync, OutcomeSuccessOnly } from "./outcome.types.js";
+import type { Outcome, OutcomeAsync, OutcomeVoid } from "./outcome.types.js";
 import { NO_VAL } from "./outcome.types.js";
 import { relay } from "./relay.js";
 import { outcome } from "./outcome.js";
 import { enrichOutcome } from "../error-report/error-report.js";
 
 // data wrapper
-export function wrap_data<T>(o: Outcome<T>, step?: string): T;
-export function wrap_data<T>(o: OutcomeAsync<T>, step?: string): Promise<T>;
-export function wrap_data<T>(
+export function relay_data<T>(o: Outcome<T>, step?: string): T;
+export function relay_data<T>(o: OutcomeAsync<T>, step?: string): Promise<T>;
+export function relay_data<T>(
   o: Outcome<T> | OutcomeAsync<T>,
   step?: string
 ): T | Promise<T> {
@@ -29,13 +29,13 @@ export function wrap_data<T>(
 }
 
 // void wrapper
-export function wrap_void(o: Outcome<void>, step?: string): OutcomeSuccessOnly;
-export function wrap_void(o: OutcomeAsync<void>, step?: string): Promise<OutcomeSuccessOnly>;
-export function wrap_void(
+export function relay_void(o: Outcome<void>, step?: string): OutcomeVoid;
+export function relay_void(o: OutcomeAsync<void>, step?: string): Promise<OutcomeVoid>;
+export function relay_void(
   o: Outcome<void> | OutcomeAsync<void>,
   step?: string
-): OutcomeSuccessOnly | Promise<OutcomeSuccessOnly> {
-  const handler = (x: Outcome<void>): OutcomeSuccessOnly => {
+): OutcomeVoid | Promise<OutcomeVoid> {
+  const handler = (x: Outcome<void>): OutcomeVoid => {
     const e = enrichOutcome(x, step);
 
     if (outcome.isErr(e)) throw e.err;
@@ -49,7 +49,7 @@ export function wrap_void(
     if (outcome.isOK(e)) return e;
 
     // Defensive: should be unreachable if your union is correct
-    throw relay.err(step ?? "invalid Outcome<void> state").err;
+    throw relay.err(step ?? "invalid Outcome<void> state");
   };
 
   return o instanceof Promise ? o.then(handler) : handler(o);

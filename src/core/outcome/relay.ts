@@ -2,7 +2,7 @@
 import ErrReport from "../error-report/error-report.js";
 import { ErrSeverity, ErrSource } from "../error-report/err-consts/err-consts.js";
 import type { ErrData } from "../error-report/err-report.types.js";
-import type { NoValue, Outcome, OutcomeDataSuccess, OutcomeFailErr, OutcomeSuccessOnly, Payload } from "./outcome.types.js";
+import type { NoValue, Outcome, OutcomeData, OutcomeErr, OutcomeVoid, Payload } from "./outcome.types.js";
 import { NO_VAL } from "./outcome.types.js";
 import { format_err } from "../../helpers/format-err.js"; // returns string (as you described)
 
@@ -60,13 +60,13 @@ export const relay = {
   data: <T>(data: T): Outcome<T> => {
     return { success: true, data } as const;
   },
-  ok: (): OutcomeSuccessOnly => ({
+  ok: (): OutcomeVoid => ({
     success: true,
     data: NO_VAL,
     __only: true,
   }),
   
-  err: (msg: string, cause?: unknown): OutcomeFailErr => {
+  err: (msg: string, cause?: unknown): OutcomeErr => {
   const cleanMsg = msg.trim();
 
   let rep: ErrReport;

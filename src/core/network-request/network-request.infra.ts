@@ -1,7 +1,7 @@
 // network-request.infra.ts
 
 import { relay } from "../outcome/relay.js";
-import { wrap_data } from "../outcome/relay.wrappers.js";
+import { relay_data } from "../outcome/relay.wrappers.js";
 import { RetryPresetΔ } from "./net-request.consts.js";
 import type { BodySpec, FailSpec, HeaderSpec, HTMLDiscriminant, HTMLSpec, JSONDiscriminant, JSONSpec, N_partial, N_request, NetworkRequestSpec, QuerySpec, RequestBuilder, URLSpec, FailRecoveryMode, NetRequestFull } from "./net-request.types.js";
 import build_net_req, { send_net_req } from "./net-request.utils.js";
@@ -154,7 +154,7 @@ function wrapNetReq<S extends Partial<NetworkRequestSpec>>(spec: S): N_request<S
                 // 'throw' required here rather than return (which errors) - investigate (todo)
                 throw relay.err('no url or method on NetReq');
             }
-            const netreq: NetRequestFull = wrap_data(build_net_req(spec));
+            const netreq: NetRequestFull = relay_data(build_net_req(spec));
             return send_net_req(netreq);
         },
         // withMeta(meta: Record<string, unknown>) {}

@@ -2,21 +2,23 @@ import type ErrReport from "../error-report/error-report.js";
 export type NoValue = "$NOVAL";
 export declare const NO_VAL: NoValue;
 export type Payload<T> = T extends NoValue ? never : T;
-export type OutcomeDataSuccess<T> = {
+export type OutcomeData<T> = {
     success: true;
     data: T;
 };
-export type OutcomeSuccessOnly = {
+export type OutcomeVoid = {
     success: true;
     data: NoValue;
     __only: true;
 };
-export type OutcomeFailErr = {
+export type OutcomeErr = {
     success: false;
     err: ErrReport;
     __fail: true;
 };
-export type Outcome<T> = OutcomeDataSuccess<T> | OutcomeSuccessOnly | OutcomeFailErr;
+export type Outcome<T> = OutcomeData<T> | OutcomeVoid | OutcomeErr;
+export type OutcomeMaybeData<T> = OutcomeData<T> | OutcomeErr;
+export type OutcomeMaybeVoid = OutcomeVoid | OutcomeErr;
 export type OutcomeAsync<T> = Promise<Outcome<T>>;
 export type OutcomeAsyncJSON<T> = OutcomeAsync<T>;
 export type OutcomeAsyncRender<T extends Record<string, unknown> = {}> = OutcomeAsync<{

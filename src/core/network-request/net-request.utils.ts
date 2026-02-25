@@ -3,7 +3,7 @@
 import { format_err } from "../../helpers/format-err.js";
 import { relay } from "../outcome/relay.js";
 import type { Outcome, OutcomeAsync } from "../outcome/outcome.types.js";
-import { wrap_data } from "../outcome/relay.wrappers.js";
+import { relay_data } from "../outcome/relay.wrappers.js";
 import type { NetRequestFull, NetResponse, NetworkRequestSpec } from "./net-request.types.js";
 import { outcome } from "../outcome/outcome.js";
 
@@ -129,11 +129,11 @@ async function Parse_ExtractHTML(response: Response, element: string): OutcomeAs
 
 export async function validate_response({ spec, res }: NetResponse): OutcomeAsync<HTMLElement> {
 
-    void wrap_data(checkResponseStatus(res), 'check response status');
+    void relay_data(checkResponseStatus(res), 'check response status');
     if (!spec.extractElement) {
         return relay.err(`no element property given to extract`);
     }
-    const r_html = wrap_data(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
+    const r_html = relay_data(await Parse_ExtractHTML(res, spec.extractElement), 'parse and extract response html');
     return relay.data(r_html);
 
 }

@@ -9,7 +9,7 @@ import {
     type OutcomeAsyncJSON,
     type OutcomeAsyncRender,
     type OutcomeAsyncSend,
-    type OutcomeDataSuccess,
+    type OutcomeData,
 } from "../outcome/outcome.types.js";
 import type {
     HttpServerResponseLike,
@@ -27,7 +27,7 @@ export const respond = {
 
                 // CHANGE: handle all three variants explicitly
                 if (outcome.isData(oc)) {
-                    res.json((oc as OutcomeDataSuccess<T>).data);
+                    res.json((oc as OutcomeData<T>).data);
                     return;
                 }
 

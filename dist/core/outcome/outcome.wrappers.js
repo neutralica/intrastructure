@@ -1,7 +1,7 @@
 // outcome.wrappers.ts
 import { relay } from "./relay.js";
 import { enrichOutcome } from "../error-report/error-report.js";
-import { wrap_data, wrap_void } from "./relay.wrappers.js";
+import { relay_data, relay_void } from "./relay.wrappers.js";
 /**
  * Runtime check for "Outcome-shaped enough".
  * NOTE: This does NOT prove it has methods attached. It only identifies the shape.

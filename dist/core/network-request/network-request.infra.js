@@ -1,6 +1,6 @@
 // network-request.infra.ts
 import { relay } from "../outcome/relay.js";
-import { wrap_data } from "../outcome/relay.wrappers.js";
+import { relay_data } from "../outcome/relay.wrappers.js";
 import { RetryPresetΔ } from "./net-request.consts.js";
 import build_net_req, { send_net_req } from "./net-request.utils.js";
 export const netReq = {
@@ -132,7 +132,7 @@ function wrapNetReq(spec) {
                 // 'throw' required here rather than return (which errors) - investigate (todo)
                 throw relay.err('no url or method on NetReq');
             }
-            const netreq = wrap_data(build_net_req(spec));
+            const netreq = relay_data(build_net_req(spec));
             return send_net_req(netreq);
         },
         // withMeta(meta: Record<string, unknown>) {}

@@ -1,7 +1,7 @@
 {
   "name": "intrastructure",
   "version": "0.1.0",
-  "description": "_INTRASTRUCTURE: error handling, monadic returns, HTTP requests, and [....]",
+  "description": "_Intrastructure: error handling, monadic returns, HTTP requests",
   "author": "neutralica @ terminal_gothic",
   "license": "Parity-7.0.0",
   "type": "module",

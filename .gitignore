@@ -29,3 +29,4 @@ _docs/
 *.tgz
 # tsc build info
 *.tsbuildinfo
+package-lock.json

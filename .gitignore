@@ -27,3 +27,5 @@ _docs/
 
 # tarballs
 *.tgz
+# tsc build info
+*.tsbuildinfo

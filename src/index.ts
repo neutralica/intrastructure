@@ -1,6 +1,6 @@
 // root index.ts
 
-export const INTRASTRUCTURE_VERSION = "0.1.0";
+export const INTRASTRUCTURE_VERSION = "0.1.1";
 // core index.ts
 export * from "./core/outcome/index.js";
 export * from "./core/error-report/index.js";

@@ -28,31 +28,31 @@
   },
 
   "./outcome": {
-    "types": "./dist/outcome/index.d.ts",
-    "import": "./dist/outcome/index.js"
+    "types": "./dist/core/outcome/index.d.ts",
+    "import": "./dist/core/outcome/index.js"
   },
   "./outcome/types": {
-    "types": "./dist/outcome/types.d.ts",
-    "import": "./dist/outcome/types.js"
+    "types": "./dist/core/outcome/types.d.ts",
+    "import": "./dist/core/outcome/types.js"
   },
 
   "./error-report": {
-    "types": "./dist/error-report/index.d.ts",
-    "import": "./dist/error-report/index.js"
+    "types": "./dist/core/error-report/index.d.ts",
+    "import": "./dist/core/error-report/index.js"
   },
 
   "./network-request": {
-    "types": "./dist/network-request/index.d.ts",
-    "import": "./dist/network-request/index.js"
+    "types": "./dist/core/network-request/index.d.ts",
+    "import": "./dis/coret/network-request/index.js"
   },
   "./network-request/types": {
-    "types": "./dist/network-request/types.d.ts",
-    "import": "./dist/network-request/types.js"
+    "types": "./dist/core/network-request/types.d.ts",
+    "import": "./dist/core/network-request/types.js"
   },
 
   "./types": {
-    "types": "./dist/types/index.d.ts",
-    "import": "./dist/types/index.js"
+    "types": "./dist/core/types/index.d.ts",
+    "import": "./dist/core/types/index.js"
   }
 },
   "scripts": {

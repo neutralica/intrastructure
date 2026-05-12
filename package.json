@@ -1,60 +1,58 @@
 {
   "name": "intrastructure",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "_Intrastructure: error handling, monadic returns, HTTP requests",
   "author": "neutralica @ terminal_gothic",
   "license": "Parity-7.0.0",
   "type": "module",
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "types": "./dist/index.d.ts",
-"exports": {
-  ".": {
-    "types": "./dist/index.d.ts",
-    "import": "./dist/index.js"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./node": {
+      "types": "./dist/node/index.d.ts",
+      "import": "./dist/node/index.js"
+    },
+    "./node/types": {
+      "types": "./dist/node/types.d.ts",
+      "import": "./dist/node/types.js"
+    },
+    "./outcome": {
+      "types": "./dist/core/outcome/index.d.ts",
+      "import": "./dist/core/outcome/index.js"
+    },
+    "./outcome/types": {
+      "types": "./dist/core/outcome/types.d.ts",
+      "import": "./dist/core/outcome/types.js"
+    },
+    "./error-report": {
+      "types": "./dist/core/error-report/index.d.ts",
+      "import": "./dist/core/error-report/index.js"
+    },
+    "./network-request": {
+      "types": "./dist/core/network-request/index.d.ts",
+      "import": "./dis/coret/network-request/index.js"
+    },
+    "./network-request/types": {
+      "types": "./dist/core/network-request/types.d.ts",
+      "import": "./dist/core/network-request/types.js"
+    },
+    "./types": {
+      "types": "./dist/core/types/index.d.ts",
+      "import": "./dist/core/types/index.js"
+    }
   },
-
-  "./core": {
-    "types": "./dist/core/index.d.ts",
-    "import": "./dist/core/index.js"
-  },
-
-  "./node": {
-    "types": "./dist/node/index.d.ts",
-    "import": "./dist/node/index.js"
-  },
-  "./node/types": {
-    "types": "./dist/node/types.d.ts",
-    "import": "./dist/node/types.js"
-  },
-
-  "./outcome": {
-    "types": "./dist/core/outcome/index.d.ts",
-    "import": "./dist/core/outcome/index.js"
-  },
-  "./outcome/types": {
-    "types": "./dist/core/outcome/types.d.ts",
-    "import": "./dist/core/outcome/types.js"
-  },
-
-  "./error-report": {
-    "types": "./dist/core/error-report/index.d.ts",
-    "import": "./dist/core/error-report/index.js"
-  },
-
-  "./network-request": {
-    "types": "./dist/core/network-request/index.d.ts",
-    "import": "./dis/coret/network-request/index.js"
-  },
-  "./network-request/types": {
-    "types": "./dist/core/network-request/types.d.ts",
-    "import": "./dist/core/network-request/types.js"
-  },
-
-  "./types": {
-    "types": "./dist/core/types/index.d.ts",
-    "import": "./dist/core/types/index.js"
-  }
-},
   "scripts": {
     "clean": "rm -rf dist && rm -f *.tsbuildinfo",
     "build": "npm run clean && tsc -p tsconfig.json && tsc -p tsconfig.node.json",

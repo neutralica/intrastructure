@@ -1,1 +1,0 @@
-{"version":3,"file":"relay.d.ts","sourceRoot":"","sources":["../../../src/core/outcome/relay.ts"],"names":[],"mappings":"AAIA,OAAO,KAAK,EAAW,OAAO,EAAe,UAAU,EAAE,WAAW,EAAW,MAAM,oBAAoB,CAAC;AAsD1G,eAAO,MAAM,KAAK;oBACT,CAAC,QAAQ,CAAC,KAAG,OAAO,CAAC,CAAC,CAAC;uBAGtB,WAAW;wBAMR,MAAM,UAAU,OAAO,KAAG,UAAU;CAqBvC,CAAC"}

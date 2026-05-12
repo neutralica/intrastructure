@@ -1,1 +1,0 @@
-{"version":3,"file":"net-request.consts.d.ts","sourceRoot":"","sources":["../../../src/core/network-request/net-request.consts.ts"],"names":[],"mappings":"AAEA,OAAO,EAAa,KAAK,gBAAgB,EAAE,MAAM,wBAAwB,CAAC;AAG1E,eAAO,MAAM,iBAAiB,EAAE,gBAK/B,CAAA;AAGD,eAAO,MAAM,YAAY,EAAE;IAAE,CAAC,GAAG,EAAE,MAAM,GAAG,gBAAgB,CAAA;CAEvB,CAAC"}
